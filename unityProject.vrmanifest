@@ -1,0 +1,16 @@
+{
+  "source": "Unity",
+  "applications": [
+    {
+      "app_key": "application.generated.unity.cs420620flutefingerings.exe",
+      "launch_type": "url",
+      "url": "steam://launch/",
+      "action_manifest_path": "C:\\Users\\demo\\Desktop\\620-flute-fingerings\\CS420-620-Flute-Fingerings\\CS420-620-Flute-Fingerings\\Assets\\StreamingAssets\\SteamVR\\actions.json",
+      "strings": {
+        "en_us": {
+          "name": "CS420-620-Flute-Fingerings [Testing]"
+        }
+      }
+    }
+  ]
+}

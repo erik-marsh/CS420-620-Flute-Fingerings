@@ -1,0 +1,20 @@
+#Hi5_Interaction_SDK ChangeLog
+All notable changes to project Hi5_Interaction_SDK will be documented in this file.
+======================
+
+##[v1.1.0.35] -2019-1-18
+### Changed
+- Reduce predefined layers from 14 to 7.
+- Use default fixed timestep setting.
+- Support collider assembly.
+- Support slope.
+- Remove object's static/moving rotation limitation.
+
+### Added
+- Gesture Recognition (4): include Okay, Flat Palm, Fist and Pointing (index finger) gestures.
+- New interface to control the interaciton (pinch, clap, lift) between any glove and all objects.
+- New interface to control the interaciton (pinch, clap, lift) between any object and all gloves.
+- New interface to enable/disable object's rotation constraints.
+
+##[v1.0.0.26] -2018-08-09 	
+* Initial release
