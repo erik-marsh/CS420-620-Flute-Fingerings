@@ -172,7 +172,7 @@ namespace Hi5_Interaction_Core
         #endregion nodes
 
         #region Angle
-        float GetAngle(Transform leftTransform, Transform midTransform, Transform rightTransform)
+        public float GetAngle(Transform leftTransform, Transform midTransform, Transform rightTransform)
         {
             Vector3 left = leftTransform.position;
             Vector3 middle = midTransform.position;
