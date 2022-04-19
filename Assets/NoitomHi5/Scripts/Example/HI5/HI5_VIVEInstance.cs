@@ -25,11 +25,11 @@ using HI5.VRCalibration;
 
         private HumanButtons mHumanButtons;
 
-        SteamVR_Events.Action newPosesAction;
+        //SteamVR_Events.Action newPosesAction;
         
         private void Awake()
         {
-            newPosesAction = SteamVR_Events.NewPosesAction(OnNewPoses);
+            //newPosesAction = SteamVR_Events.NewPosesAction(OnNewPoses);
             mHumanButtons = GetComponentInChildren<HumanButtons>();
       
         }
@@ -38,15 +38,15 @@ using HI5.VRCalibration;
         {
             base.OnEnable();
             //LoadValidBones();
-            if(newPosesAction != null)
-                newPosesAction.enabled = true;
+            //if(newPosesAction != null)
+            //    newPosesAction.enabled = true;
         }
 
         new void OnDisable()
         {
             base.OnDisable();
-            if(newPosesAction != null)
-                newPosesAction.enabled = false;
+            //if(newPosesAction != null)
+            //    newPosesAction.enabled = false;
         }
 
         private void Start()
@@ -56,6 +56,8 @@ using HI5.VRCalibration;
 
         new void Update()
         {
+            Debug.Log(m_Status.Status);
+
             base.Update();
             //ruige 2018 3 27
             if (m_Status != null)
@@ -90,9 +92,12 @@ using HI5.VRCalibration;
             bool isAvailable = false;
             if (m_Status != null)
                 isAvailable  = m_Status.IsGloveAvailable(HandType);
-            bool isBinded = HI5_BindInfoManager.IsGloveBinded(HandType);
+            bool isBinded = HI5_BindInfoManager.IsGloveBinded(HandType); // THE PROBLEM
+            isBinded = true;
             bool isBposSuccess = HI5_Manager.GetGloveStatus().isGloveBPosSuccess();
-           
+
+            Debug.Log("CheckIsValid => isAvailable: " + isAvailable + " && isBinded: " + isBinded + " && isBposSuccess: " + isBposSuccess);
+
             if (isAvailable && isBinded && isBposSuccess)
             {
                 if (HI5_Calibration.IsCalibratingBPose)
@@ -208,10 +213,10 @@ using HI5.VRCalibration;
             if (!poses[index].bPoseIsValid)
                 return;
 
-            var pose = new SteamVR_Utils.RigidTransform(poses[index].mDeviceToAbsoluteTracking);
+            //var pose = new SteamVR_Utils.RigidTransform(poses[index].mDeviceToAbsoluteTracking);
 
-            Vector3 pos = pose.pos;
-            Quaternion rot = pose.rot;
+            Vector3 pos = Vector3.zero;// pose.pos;
+            Quaternion rot = Quaternion.identity;// pose.rot;
             if (m_Status.Status != GloveStatus.NoGlove 
                 && m_Status.Status != GloveStatus.NoDongle
                 && HI5_Manager.IsDongleAvailable()
