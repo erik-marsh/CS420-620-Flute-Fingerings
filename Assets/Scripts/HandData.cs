@@ -7,6 +7,7 @@ using Hi5_Interaction_Core;
 
 public class HandData : MonoBehaviour
 {
+    public PianoRoll pianoRoll;
     public Text[] texts;
     public Text fingeringName;
     //public Hi5_Hand_Collider_Visible_Thumb_Finger[] thumbs;
@@ -51,5 +52,6 @@ public class HandData : MonoBehaviour
 
         var fingering = Fingering.GetFingeringByCombination(keyCombination);
         fingeringName.text = fingering.name;
+        pianoRoll.SetKey(fingering.midiNote);
     }
 }

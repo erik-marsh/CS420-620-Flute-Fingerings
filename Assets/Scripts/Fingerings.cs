@@ -108,5 +108,17 @@ public class Fingering
 
         return res;
     }
+
+    public static Fingering GetFingeringByMIDINote(int midiNote)
+    {
+        Fingering res = nullFingering;
+        foreach (var f in knownFingerings)
+        {
+            if (f.midiNote == midiNote)
+                res = f;
+        }
+
+        return res;
+    }
     #endregion
 }
