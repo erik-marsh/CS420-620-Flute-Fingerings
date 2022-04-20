@@ -33,8 +33,11 @@ public class HandData : MonoBehaviour
         {
             var text = texts[i];
             var finger = fingers[i];
+            // these are indexed starting at 1 for some reason
             float angle = finger.GetAngle(finger.mChildNodes[1], finger.mChildNodes[3], finger.mChildNodes[4]);
             text.text = text.gameObject.name + ": " + angle.ToString("0.00");
+
+            // TODO: tbh the best way to go about this is having one threshold per finger, since the GetAngle gives different results depending on the finger
             if (angle < 160.0f)
             {
                 text.color = Color.green;
