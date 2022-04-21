@@ -13,6 +13,8 @@ public class HandData : MonoBehaviour
     //public Hi5_Hand_Collider_Visible_Thumb_Finger[] thumbs;
     public Hi5_Hand_Visible_Finger[] fingersVisible;
     public Hi5_Glove_Interaction_Finger[] fingers;
+    public Transform[] fingerReferenceNodes;
+    private float[] fingerThresholds = new float[10];
 
     public float updatePeriod = 0.5f;
     private float timer = 0.0f;
@@ -20,6 +22,20 @@ public class HandData : MonoBehaviour
     private void Awake()
     {
         fingeringName.text = "";
+        fingerThresholds = new float[10]
+        {
+            170.0f,
+            158.0f,
+            145.0f,
+            120.0f,
+            157.0f,
+
+            160.0f,
+            160.0f,
+            160.0f,
+            150.0f,
+            999.0f  // garbage value, not needed
+        };
     }
 
     private void Update()
@@ -38,8 +54,32 @@ public class HandData : MonoBehaviour
             float angle = finger.GetAngle(finger.mChildNodes[1], finger.mChildNodes[3], finger.mChildNodes[4]);
             text.text = text.gameObject.name + ": " + angle.ToString("0.00");
 
+            if (i == 0)
+            {
+                foreach (var node in finger.mChildNodes)
+                {
+                    Debug.Log(node.Value.gameObject.name);
+                    Debug.DrawRay(node.Value.position, Vector3.up, Color.red, updatePeriod);
+                }
+
+                Debug.DrawRay(fingerReferenceNodes[i].transform.position, Vector3.up, Color.blue, updatePeriod);
+                Debug.Log(Vector3.Angle(
+                    finger.mChildNodes[1].position - fingerReferenceNodes[i].position,
+                    finger.mChildNodes[4].position - fingerReferenceNodes[i].position
+                ));
+            }
+
+
+            // test different algo
+            // this one might be a good choice for the LH Index because of how my fingers like to bend
+            //angle = Vector3.Angle(
+            //    finger.mChildNodes[1].position - fingerReferenceNodes[i].position,
+            //    finger.mChildNodes[4].position - fingerReferenceNodes[i].position
+            //);
+            //text.text = text.gameObject.name + ": " + angle.ToString("0.00");
+
             // TODO: tbh the best way to go about this is having one threshold per finger, since the GetAngle gives different results depending on the finger
-            if (angle < 160.0f)
+            if (angle < fingerThresholds[i])
             {
                 text.color = Color.green;
                 keyCombination |= (uint)1 << i;
