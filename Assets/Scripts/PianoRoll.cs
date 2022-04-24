@@ -5,6 +5,10 @@ using UnityEngine.UI;
 
 public class PianoRoll : MonoBehaviour
 {
+    public RectTransform rectTransform;
+    [Tooltip("Shows the extents in which the piano roll will be created")]
+    public Image pianoRollPlaceholder;
+
     public GameObject whiteKey;
     public GameObject blackKey;
     public Text lowKeyText;
@@ -12,21 +16,42 @@ public class PianoRoll : MonoBehaviour
 
     public int startNote = 72;
     public int semitoneSpan = 12;
-    public float keyWidth = 25.0f;
-    public float keyHeight = 100.5f;
-    public float pianoRollWidth;
+    [Tooltip("The sum of the left and right margins of the keys")]
+    public float keyMargins = 1.0f;
+    [SerializeField]
+    private float keyWidth = 25.0f;
+    [SerializeField]
+    private float keyHeight = 100.5f;
+    [SerializeField]
+    private float pianoRollWidth;
+    [SerializeField]
+    private float pianoRollHeight;
 
     private List<GameObject> keyObjects = new List<GameObject>();
     private int lastSetKeyIndex = 0;
 
     private void Start()
     {
+        pianoRollPlaceholder.enabled = false;
+
+        pianoRollWidth = rectTransform.sizeDelta.x;
+        pianoRollHeight = rectTransform.sizeDelta.y;
+
+        keyWidth = pianoRollWidth / (float)semitoneSpan;
+        keyHeight = pianoRollHeight;
+
         for (int i = 0; i < semitoneSpan; i++)
         {
-            var prefab = IsWhiteKey(startNote + i) ? whiteKey : blackKey;
+            bool isWhite = IsWhiteKey(startNote + i);
+            var prefab = isWhite ? whiteKey : blackKey;
             var key = Instantiate(prefab, this.transform);
+
             var keyTransform = key.GetComponent<RectTransform>();
             keyTransform.position += new Vector3(i * keyWidth, 0.0f, 0.0f);
+            keyTransform.sizeDelta = new Vector2(
+                keyWidth - (2.0f * keyMargins),
+                isWhite ? keyHeight : keyHeight - 20.0f
+            ); // sorry
             keyObjects.Add(key);
         }
 
@@ -36,7 +61,7 @@ public class PianoRoll : MonoBehaviour
         lowKeyText.text = lowKey.name;
         highKeyText.text = highKey.name;
 
-        lowKeyText.transform.position = keyObjects[0].transform.position + new Vector3(0.0f, keyHeight, 0.0f);
+        lowKeyText.transform.position = keyObjects[0].transform.position + new Vector3(-keyWidth, keyHeight, 0.0f);
         highKeyText.transform.position = keyObjects[semitoneSpan - 1].transform.position + new Vector3(0.0f, keyHeight, 0.0f);
     }
 

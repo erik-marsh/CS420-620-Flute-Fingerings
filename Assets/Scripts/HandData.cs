@@ -7,10 +7,14 @@ using Hi5_Interaction_Core;
 
 public class HandData : MonoBehaviour
 {
+    // every list should have the fingers in the correct order:
+    // LIndex, LMiddle, LRing, LPinky, LThumb, RIndex, RMiddle, RRing, RPinky, RThumb
+
     public PianoRoll pianoRoll;
     public Text[] texts;
     public Text fingeringName;
     //public Hi5_Hand_Collider_Visible_Thumb_Finger[] thumbs;
+    public Image[] UIFingerImages;
     public Hi5_Hand_Visible_Finger[] fingersVisible;
     public Hi5_Glove_Interaction_Finger[] fingers;
     public Transform[] fingerReferenceNodes;
@@ -18,6 +22,8 @@ public class HandData : MonoBehaviour
 
     public float updatePeriod = 0.5f;
     private float timer = 0.0f;
+
+    private int lastFingerSet = 0;
 
     private void Awake()
     {
@@ -34,7 +40,7 @@ public class HandData : MonoBehaviour
             160.0f,
             160.0f,
             150.0f,
-            999.0f  // garbage value, not needed
+            0.0f
         };
     }
 
@@ -52,7 +58,7 @@ public class HandData : MonoBehaviour
             var finger = fingers[i];
             // these are indexed starting at 1 for some reason
             float angle = finger.GetAngle(finger.mChildNodes[1], finger.mChildNodes[3], finger.mChildNodes[4]);
-            text.text = text.gameObject.name + ": " + angle.ToString("0.00");
+            text.text = /*text.gameObject.name + ": " + */angle.ToString("0.00");
 
             if (i == 0)
             {
@@ -82,11 +88,13 @@ public class HandData : MonoBehaviour
             if (angle < fingerThresholds[i])
             {
                 text.color = Color.green;
+                UIFingerImages[i].color = Color.green;
                 keyCombination |= (uint)1 << i;
             }
             else
             {
                 text.color = Color.black;
+                UIFingerImages[i].color = Color.white;
             }
         }
 
