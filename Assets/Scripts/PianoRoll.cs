@@ -14,8 +14,8 @@ public class PianoRoll : MonoBehaviour
     public Text lowKeyText;
     public Text highKeyText;
 
-    public int startNote = 72;
-    public int semitoneSpan = 12;
+    public int startNote = 62;
+    public int semitoneSpan = 25;
     [Tooltip("The sum of the left and right margins of the keys")]
     public float keyMargins = 1.0f;
     [SerializeField]
@@ -62,7 +62,8 @@ public class PianoRoll : MonoBehaviour
         highKeyText.text = highKey.name;
 
         lowKeyText.transform.position = keyObjects[0].transform.position + new Vector3(-keyWidth, keyHeight, 0.0f);
-        highKeyText.transform.position = keyObjects[semitoneSpan - 1].transform.position + new Vector3(0.0f, keyHeight, 0.0f);
+        float highKeyYOffset = IsWhiteKey(startNote + semitoneSpan - 1) ? keyHeight : keyHeight - 20.0f;
+        highKeyText.transform.position = keyObjects[semitoneSpan - 1].transform.position + new Vector3(0.0f, highKeyYOffset, 0.0f);
     }
 
     /// <summary>

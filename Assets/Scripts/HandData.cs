@@ -58,21 +58,24 @@ public class HandData : MonoBehaviour
             var finger = fingers[i];
             // these are indexed starting at 1 for some reason
             float angle = finger.GetAngle(finger.mChildNodes[1], finger.mChildNodes[3], finger.mChildNodes[4]);
-            text.text = /*text.gameObject.name + ": " + */angle.ToString("0.00");
+            text.text = angle.ToString("0.00");
 
             if (i == 0)
             {
                 foreach (var node in finger.mChildNodes)
                 {
                     Debug.Log(node.Value.gameObject.name);
-                    Debug.DrawRay(node.Value.position, Vector3.up, Color.red, updatePeriod);
+                    //Debug.DrawRay(node.Value.position, Vector3.up, Color.red, updatePeriod);
                 }
 
-                Debug.DrawRay(fingerReferenceNodes[i].transform.position, Vector3.up, Color.blue, updatePeriod);
+                //Debug.DrawRay(fingerReferenceNodes[i].transform.position, Vector3.up, Color.blue, updatePeriod);
                 Debug.Log(Vector3.Angle(
                     finger.mChildNodes[1].position - fingerReferenceNodes[i].position,
                     finger.mChildNodes[4].position - fingerReferenceNodes[i].position
                 ));
+
+                Debug.DrawRay(fingerReferenceNodes[i].position, (finger.mChildNodes[1].position - fingerReferenceNodes[i].position) * 10.0f, Color.red, updatePeriod);
+                Debug.DrawRay(fingerReferenceNodes[i].position, (finger.mChildNodes[4].localPosition - fingerReferenceNodes[i].localPosition) * 10.0f, Color.blue, updatePeriod);
             }
 
 
@@ -82,7 +85,7 @@ public class HandData : MonoBehaviour
             //    finger.mChildNodes[1].position - fingerReferenceNodes[i].position,
             //    finger.mChildNodes[4].position - fingerReferenceNodes[i].position
             //);
-            //text.text = text.gameObject.name + ": " + angle.ToString("0.00");
+            //text.text = angle.ToString("0.00");
 
             // TODO: tbh the best way to go about this is having one threshold per finger, since the GetAngle gives different results depending on the finger
             if (angle < fingerThresholds[i])
@@ -99,7 +102,9 @@ public class HandData : MonoBehaviour
         }
 
         var fingering = Fingering.GetFingeringByCombination(keyCombination);
-        fingeringName.text = fingering.name;
+        fingeringName.text = "Detected: ";
+        if (fingering != Fingering.nullFingering)
+            fingeringName.text += fingering.name + " (" + fingering.frequency.ToString("0.00") + "Hz)";
         pianoRoll.SetKey(fingering.midiNote);
     }
 }
