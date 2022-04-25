@@ -10,6 +10,8 @@ namespace NotePlayer
     /// </summary>
     public class PN_NotePlayer : MonoBehaviour
     {
+        #region Members
+
         private float s_RoutineUpdateInterval = 1f;
 
         public PN_NotePlayerPreset _Preset;
@@ -19,6 +21,8 @@ namespace NotePlayer
         public float _NoteDuration = -1f;
 
         private AudioSource _AudioSource;
+
+        #endregion
 
         private void Awake()
         {

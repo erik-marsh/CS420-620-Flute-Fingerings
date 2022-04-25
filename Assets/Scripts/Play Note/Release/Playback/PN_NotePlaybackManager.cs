@@ -17,9 +17,11 @@ namespace NotePlayer
     ///     Invoking a new playback will stop any current playback
     /// </para>
     /// </remarks>
-    public class PN_NotePlaybackManager : MonoBehaviour
+    public class PN_NotePlaybackManager : MonoBehaviour, System.IDisposable
     {
         #region Members
+
+        public bool FLAG_Debug = false;
 
         /// <summary>
         /// Preset to look up <see cref="NoteInfo"/> information
@@ -50,20 +52,66 @@ namespace NotePlayer
 
         #endregion
 
+        #region Destroy
+
+        private void OnDestroy()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            //cleanup multithreading
+            _CancellationTokenSource.Cancel();
+            _CancellationTokenSource.Dispose();
+        }
+
+        #endregion
+
         #region Multithreading
 
-        protected async System.Threading.Tasks.Task NotePlayback(System.Threading.CancellationToken ct)
+        protected async System.Threading.Tasks.Task Async_PlaybackRecording(System.Threading.CancellationToken cancelToken, PN_RecordingSession session)
         {
+            System.Threading.CancellationTokenSource cts = System.Threading.CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
 
+            try
+            {
+                int curNoteIndex = 0;
+                while (!cancelToken.IsCancellationRequested && curNoteIndex < session.List_RecordingEntries.Count)
+                {
+                    //play current note
+                    var np = _Preset.CreateNotePlayer(session.List_RecordingEntries[curNoteIndex]._NoteInfo._Name);
+                    np._NoteDuration = Mathf.Abs(session.List_RecordingEntries[curNoteIndex]._NoteStartTime - session.List_RecordingEntries[curNoteIndex]._NoteEndTime);
+
+                    //wait until next note
+                    curNoteIndex++;
+                    //TODO: investigate the 1ms delay
+                    //1 added ms delay for some reason helps...
+                    await System.Threading.Tasks.Task.Delay((int)(1000 * session.List_RecordingEntries[curNoteIndex]._NoteStartTime) + 1, cts.Token); 
+                }
+            }
+            catch (System.OperationCanceledException)
+            {
+                //how do we handle cancel?
+                //OnCooldownAvailable?.Invoke(this, new CooldownTrackerEventArgs(this));
+                if (FLAG_Debug) Debug.Log(ToString() + ": Task Canceled early!");
+            }
+            finally
+            {
+                if (FLAG_Debug) Debug.Log(ToString() + ": Disposal of Cancellation Token Source!");
+                Dispose();
+            }
         }
 
         #endregion
 
         #region Public Methods
 
-        public bool PlayRecordingSession()
+        public bool PlayRecordingSession(PN_RecordingSession session)
         {
+            if (session == null) return false;
 
+            System.Threading.Tasks.Task t = Async_PlaybackRecording(_CancellationTokenSource.Token, session);
 
             return true;
         }
