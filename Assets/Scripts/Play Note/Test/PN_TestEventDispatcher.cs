@@ -31,6 +31,15 @@ namespace NotePlayer
         //may not actually need the preset ref on this component
         public PN_NotePlayerPreset _Preset;
 
+        public testOptions Options;
+
+        [System.Serializable]
+        public struct testOptions
+        {
+            public PN_NotePlaybackManager Test2_PlaybackManager;
+        }
+
+
         #region Initialization
 
         private void Awake()
@@ -71,10 +80,11 @@ namespace NotePlayer
             }
         }
         /// <summary>
-        /// Periodically sends a note event with a set duration
+        /// Periodically sends a note event with a set duration, then induce playback
         /// </summary>
         protected IEnumerator I_Test2(float duration)
         {
+            //dispatch note events
             float startTime = Time.time;
             while (Mathf.Abs(Time.time - startTime) < duration)
             {
@@ -86,6 +96,8 @@ namespace NotePlayer
                 OnNoteEnd?.Invoke(this, new Utils.StringEventArgs("c1"));
                 yield return new WaitForSeconds(1f);
             }
+
+
         }
     }
 

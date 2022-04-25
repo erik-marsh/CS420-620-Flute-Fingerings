@@ -46,6 +46,15 @@ namespace NotePlayer
         #endregion
 
         /// <summary>
+        /// Reinvoke an expensive, 1-time init to verify no note names are duplicated
+        /// </summary>
+        public void ReInitialize()
+        {
+            _initialized = false;
+            Initialize();
+        }
+
+        /// <summary>
         /// expensive, 1-time init to verify no note names are duplicated
         /// </summary>
         private void Initialize()
@@ -94,7 +103,7 @@ namespace NotePlayer
         /// <summary>
         /// Instantiates an audio source based on this SO's AudioSource field
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Gameobject with attached AudioSource</returns>
         private GameObject CreateAudioSourceInstance(NoteInfo info)
         {
             GameObject go = Instantiate(AudioSourcePrefab);
