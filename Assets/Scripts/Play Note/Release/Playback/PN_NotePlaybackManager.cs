@@ -152,6 +152,21 @@ namespace NotePlayer
             return true;
         }
 
+        /// <summary>
+        /// Stops active playback
+        /// </summary>
+        /// <remarks>
+        /// Any notes that were created before this call will still play their full duration.
+        /// </remarks>
+        /// <returns>Whether playback was canceled successfully</returns>
+        public bool StopActivePlayback()
+        {
+            Dispose();
+            //_CancellationTokenSource = new System.Threading.CancellationTokenSource();
+
+            return true;
+        }
+
         #endregion
     }
 }

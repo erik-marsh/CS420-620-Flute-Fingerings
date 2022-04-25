@@ -35,7 +35,7 @@ namespace NotePlayer
         /// <summary>
         /// The current note being recorded. Contains <see cref="NoteInfo"/> data alongside timestamps for playback.
         /// </summary>
-        [field: SerializeField] 
+        //[field: SerializeField] 
         public PN_RecordingSession.RecordingEntry CurrentActiveNote { get; private set; }
 
         /// <summary>
