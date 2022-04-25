@@ -18,6 +18,8 @@ namespace NotePlayer
 
         public bool ContinueTesting { get; set; } = true;
 
+        public bool FLAG_Debug = false;
+
         public PN_NotePlayerPreset _Preset;
 
         private void Awake()
@@ -29,6 +31,11 @@ namespace NotePlayer
             }
         }
 
+        private void Start()
+        {
+            StartCoroutine(I_Test1());
+        }
+
         /// <summary>
         /// Periodically sends a note event
         /// </summary>
@@ -37,6 +44,8 @@ namespace NotePlayer
         {
             while(ContinueTesting)
             {
+                if (FLAG_Debug) Debug.Log("Invoking Note Events!");
+
                 OnNoteStart?.Invoke(this, new Utils.StringEventArgs("c1"));
                 yield return new WaitForSeconds(1f);
 
