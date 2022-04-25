@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using System.Linq;
+
 namespace NotePlayer
 {
     /// <summary>
@@ -37,6 +39,7 @@ namespace NotePlayer
         public struct testOptions
         {
             public PN_NotePlaybackManager Test2_PlaybackManager;
+            public PN_NoteRecorder_EventHandler Test2_EventHandler;
         }
 
 
@@ -84,6 +87,9 @@ namespace NotePlayer
         /// </summary>
         protected IEnumerator I_Test2(float duration)
         {
+            //__recording start___
+            Options.Test2_EventHandler.StartRecording();
+
             //dispatch note events
             float startTime = Time.time;
             while (Mathf.Abs(Time.time - startTime) < duration)
@@ -97,7 +103,12 @@ namespace NotePlayer
                 yield return new WaitForSeconds(1f);
             }
 
+            Options.Test2_EventHandler.StopRecording();
+            //__recording end___
 
+            PN_RecordingSession lastSession = Options.Test2_EventHandler.PreviousRecordingSessions.Last();
+
+            Options.Test2_PlaybackManager.PlayRecordingSession(lastSession);
         }
     }
 

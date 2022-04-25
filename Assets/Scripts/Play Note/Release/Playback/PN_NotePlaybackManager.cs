@@ -80,7 +80,7 @@ namespace NotePlayer
                 while (!cancelToken.IsCancellationRequested && curNoteIndex < session.List_RecordingEntries.Count)
                 {
                     //play current note
-                    var np = _Preset.CreateNotePlayer(session.List_RecordingEntries[curNoteIndex]._NoteInfo._Name);
+                    PN_NotePlayer np = _Preset.CreateNotePlayer(session.List_RecordingEntries[curNoteIndex]._NoteInfo._Name);
                     np._NoteDuration = Mathf.Abs(session.List_RecordingEntries[curNoteIndex]._NoteStartTime - session.List_RecordingEntries[curNoteIndex]._NoteEndTime);
 
                     //wait until next note
