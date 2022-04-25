@@ -12,6 +12,7 @@ namespace NotePlayer
     {
         #region Members
 
+        private bool s_GLOBALDEBUG = true;
         private float s_RoutineUpdateInterval = 1f;
 
         public PN_NotePlayerPreset _Preset;
@@ -59,6 +60,8 @@ namespace NotePlayer
 
         public IEnumerator I_ContinuePlayNote()
         {
+            if (s_GLOBALDEBUG) Debug.Log("Playing note: " + _DesiredNote._Name + "!");
+
             _AudioSource.Play();
             while(_AudioSource.isPlaying)
             {

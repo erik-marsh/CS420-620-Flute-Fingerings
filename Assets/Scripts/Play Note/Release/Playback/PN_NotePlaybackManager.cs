@@ -83,8 +83,11 @@ namespace NotePlayer
 
             try
             {
-                int curNoteIndex = 0;
                 if (FLAG_Debug) Debug.Log("Entries count for session: " + session.List_RecordingEntries.Count.ToString());
+
+                //loop variables
+                int curNoteIndex = 0;
+                float nextDelay_Seconds;
                 while (!cancelToken.IsCancellationRequested && curNoteIndex < session.List_RecordingEntries.Count)
                 {
                     //play current note
@@ -97,11 +100,17 @@ namespace NotePlayer
                         debugOutput += "{ " + session.List_RecordingEntries[curNoteIndex]._NoteInfo._Name + ", " + session.List_RecordingEntries[curNoteIndex]._NoteStartTime + " }, ";
                     }
 
-                    //wait until next note
+
+                    //compute delay offset to next note
                     curNoteIndex++;
-                    //TODO: investigate the 1ms delay
-                    //1 added ms delay for some reason helps...
-                    await System.Threading.Tasks.Task.Delay((int)(1000 * session.List_RecordingEntries[curNoteIndex]._NoteStartTime) + 1, cts.Token); 
+                    nextDelay_Seconds = session.List_RecordingEntries[curNoteIndex]._NoteStartTime - session.List_RecordingEntries[Mathf.Max(0, (curNoteIndex - 1))]._NoteStartTime;
+
+                    if (FLAG_Debug) Debug.Log("Delay to next: " + nextDelay_Seconds.ToString());
+
+                    // wait until next note
+                    // TODO: investigate the 1ms delay
+                    // 1 added ms delay for some reason helps...
+                    await System.Threading.Tasks.Task.Delay((int)(1000 * nextDelay_Seconds) + 1, cts.Token); //this function has time arg in ms
                 }
 
                 if (FLAG_Debug)
