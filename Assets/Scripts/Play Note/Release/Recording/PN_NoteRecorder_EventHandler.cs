@@ -135,6 +135,8 @@ namespace NotePlayer
 
         #endregion
 
+        #region Internal Methods
+
         private void StoreActiveNote()
         {
             if (ActiveRecordingSession == null || CurrentActiveNote == null) return;
@@ -148,6 +150,10 @@ namespace NotePlayer
             _List_InactiveRecordingSessions.Add(ActiveRecordingSession);
             ActiveRecordingSession = null;
         }
+
+        #endregion
+
+        #region Public Methods
 
         /// <summary>
         /// Start a new recording session.
@@ -171,5 +177,7 @@ namespace NotePlayer
 
             StoreCurrentSession();
         }
+
+        #endregion
     }
 }

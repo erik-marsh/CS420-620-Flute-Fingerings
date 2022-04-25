@@ -117,8 +117,7 @@ namespace NotePlayer
             PN_NotePlayer notePlayer = new PN_NotePlayer();
 
             notePlayer._Preset = this;
-
-
+            notePlayer._NoteDuration = 0f; // should be set further up (i.e., using playback info)
 
             return notePlayer;
         }

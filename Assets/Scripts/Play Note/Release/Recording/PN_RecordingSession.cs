@@ -7,6 +7,10 @@ namespace NotePlayer
     /// <summary>
     /// Container data structure that represents a recording of played notes
     /// </summary>
+    /// <remarks>
+    /// Timestamp data must be manually relativized by a manager class, 
+    ///  otherwise timestamps in <see cref="RecordingEntry"/>'s will be in absolute time from whenever they were recorded.
+    /// </remarks>
     public class PN_RecordingSession
     {
         [field: SerializeField]
@@ -50,10 +54,36 @@ namespace NotePlayer
         /// <returns></returns>
         public bool AddEntry(RecordingEntry entry)
         {
-            if (!ValidateEntry(entry)) return false;
+            if (!ValidateEntry(entry))
+            {
+                Debug.LogWarning(entry.ToString() + " Entry Invalid!");
+                return false;
+            }
 
             List_RecordingEntries.Add(entry);
             return true;
+        }
+
+        /// <summary>
+        /// Relativizes recording timestamp data such that the first note is played at t=0 and subsequent timestamps are expressed as an offset to that time.
+        /// </summary>
+        public void RelativizeRecordingTimestampData()
+        {
+            if (List_RecordingEntries.Count < 1) return;
+
+            float startTimestamp = List_RecordingEntries[0]._NoteStartTime;
+            //List_RecordingEntries[0]._NoteStartTime = 0f;
+
+            foreach (var e in List_RecordingEntries)
+            {
+                e._NoteStartTime = startTimestamp - e._NoteStartTime;
+                e._NoteEndTime = startTimestamp - e._NoteEndTime;
+
+                if(e._NoteStartTime < 0 || e._NoteEndTime < 0)
+                {
+                    throw new System.Exception("Invalid Recording timestamp data"); //no idea how this would get through but this makes this method safe
+                }
+            }
         }
     }
 }

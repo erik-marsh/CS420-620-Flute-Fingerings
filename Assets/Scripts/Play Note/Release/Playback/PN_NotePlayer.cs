@@ -16,6 +16,8 @@ namespace NotePlayer
 
         public NoteInfo _DesiredNote;
 
+        public float _NoteDuration = -1f;
+
         private AudioSource _AudioSource;
 
         private void Awake()
@@ -41,6 +43,10 @@ namespace NotePlayer
             if (_AudioSource == null)
             {
                 throw new System.Exception(ToString() + ": Preset not set");
+            }
+            if (_NoteDuration < 0)
+            {
+                throw new System.Exception(ToString() + ": Note duration not set");
             }
 
             //play note then destroy this gameobject
