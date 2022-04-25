@@ -99,7 +99,7 @@ namespace NotePlayer
             finally
             {
                 if (FLAG_Debug) Debug.Log(ToString() + ": Disposal of Cancellation Token Source!");
-                Dispose();
+                cts.Dispose();
             }
         }
 
@@ -110,6 +110,9 @@ namespace NotePlayer
         public bool PlayRecordingSession(PN_RecordingSession session)
         {
             if (session == null) return false;
+
+            //cancel any active playback thread(s)
+            _CancellationTokenSource.Cancel();
 
             System.Threading.Tasks.Task t = Async_PlaybackRecording(_CancellationTokenSource.Token, session);
 
