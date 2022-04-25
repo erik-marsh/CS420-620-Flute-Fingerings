@@ -7,17 +7,6 @@ using System.Linq;
 namespace NotePlayer
 {
     /// <summary>
-    /// Helper to contain info needed to construct and play a note
-    /// </summary>
-    [System.Serializable]
-    public class NoteInfo
-    {
-        public string _Name;
-        public AudioClip _AudioClip;
-
-    }
-
-    /// <summary>
     /// Event arg helper
     /// </summary>
     public class NoteEventArgs : System.EventArgs
@@ -49,6 +38,11 @@ namespace NotePlayer
         [Header("Input Note audio files + names here")]
         public List<NoteInfo> List_Notes = new List<NoteInfo>();
 
+        /// <summary>
+        /// internal dictionary for retrieval of notes by name key
+        /// </summary>
+        private Dictionary<string, NoteInfo> _NoteDictionary;
+
         #endregion
 
         /// <summary>
@@ -62,6 +56,7 @@ namespace NotePlayer
             if (AudioSourcePrefab == null) throw new System.Exception("Audio Source Prefab reference missing");
             if (AudioSourcePrefab.GetComponent<AudioSource>() == null) throw new System.Exception("Audio Source Prefab AudioSource component missing");
 
+            //filter out duplicate note names
             List<NoteInfo> validNotes = new List<NoteInfo>();
             List<NoteInfo> invalidNotes = new List<NoteInfo>();
 
@@ -84,6 +79,13 @@ namespace NotePlayer
             foreach(var n in validNotes)
             {
                 List_Notes.Add(n);
+            }
+
+            //construct dictionary of notes
+            _NoteDictionary = new Dictionary<string, NoteInfo>();
+            foreach(var n in List_Notes)
+            {
+                _NoteDictionary.Add(n._Name, n);
             }
 
             _initialized = true;
@@ -119,6 +121,21 @@ namespace NotePlayer
 
 
             return notePlayer;
+        }
+
+        /// <summary>
+        /// Retrieves the desired note info from the specified <paramref name="noteName"/> arg
+        /// </summary>
+        /// <param name="noteName">name of note to retrieve</param>
+        /// <returns>Desired note info or null if none exists.</returns>
+        public NoteInfo RetrieveNoteInfo(string noteName)
+        {
+            NoteInfo value;
+
+            if (_NoteDictionary.TryGetValue(noteName, out value)) return value;
+
+            Debug.LogWarning("Note Info not found for note name: \"" + noteName + "\" Does an entry exist in this Preset?");
+            return null;
         }
     }
 }
