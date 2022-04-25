@@ -20,6 +20,7 @@ namespace NotePlayer
 
         public bool FLAG_Debug = false;
 
+        //may not actually need the preset ref on this component
         public PN_NotePlayerPreset _Preset;
 
         private void Awake()
