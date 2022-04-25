@@ -146,6 +146,8 @@ namespace NotePlayer
         }
         private void StoreCurrentSession()
         {
+            //nullify absolute-time from this recording session. (instead, it will be expressed as base-offset time where startTime is t=0)
+            ActiveRecordingSession.RelativizeRecordingTimestampData();
 
             _List_InactiveRecordingSessions.Add(ActiveRecordingSession);
             ActiveRecordingSession = null;
