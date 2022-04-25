@@ -33,6 +33,7 @@ namespace NotePlayer
     /// <summary>
     /// Preset container for <see cref="NotePlayer"/>
     /// </summary>
+    [CreateAssetMenu(fileName ="NotePlayerPreset_", menuName ="Note Player/Note Player Preset")]
     public class PN_NotePlayerPreset : ScriptableObject
     {
         #region Members
