@@ -139,7 +139,8 @@ namespace NotePlayer
 
         private void StoreActiveNote()
         {
-            if (ActiveRecordingSession == null || CurrentActiveNote == null) return;
+            //discard if the active not is not valid or it doesnt exist
+            if (ActiveRecordingSession == null || CurrentActiveNote == null || !CurrentActiveNote.IsValid) return;
 
             ActiveRecordingSession.AddEntry(CurrentActiveNote);
             CurrentActiveNote = null;

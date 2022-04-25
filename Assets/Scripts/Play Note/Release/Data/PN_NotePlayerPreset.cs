@@ -108,7 +108,7 @@ namespace NotePlayer
         {
             GameObject go = Instantiate(AudioSourcePrefab);
 
-            AudioSource audioSrc = go.GetComponent<AudioSource>();
+            AudioSource audioSrc = go.GetComponent<AudioSource>(); //
 
             audioSrc.clip = info._AudioClip;
 
@@ -123,9 +123,16 @@ namespace NotePlayer
         {
             Initialize();
 
-            PN_NotePlayer notePlayer = new PN_NotePlayer();
+            NoteInfo ni = RetrieveNoteInfo(noteName);
+            if (ni == null) return null;
+
+            var go = CreateAudioSourceInstance(ni);
+            if (go == null) return null;
+
+            PN_NotePlayer notePlayer = go.AddComponent<PN_NotePlayer>();
 
             notePlayer._Preset = this;
+            notePlayer._DesiredNote = ni;
             notePlayer._NoteDuration = 0f; // should be set further up (i.e., using playback info)
 
             return notePlayer;

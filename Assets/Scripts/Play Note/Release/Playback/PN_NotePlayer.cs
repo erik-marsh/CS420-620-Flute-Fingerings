@@ -42,11 +42,11 @@ namespace NotePlayer
             }
             if (_DesiredNote == null)
             {
-                throw new System.Exception(ToString() + ": Preset not set");
+                throw new System.Exception(ToString() + ": Desired Note not set");
             }
             if (_AudioSource == null)
             {
-                throw new System.Exception(ToString() + ": Preset not set");
+                throw new System.Exception(ToString() + ": Audio source not set");
             }
             if (_NoteDuration < 0)
             {

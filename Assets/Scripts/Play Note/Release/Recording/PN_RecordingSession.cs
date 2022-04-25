@@ -18,23 +18,28 @@ namespace NotePlayer
 
         #region Helpers
 
+        [System.Serializable]
         public class RecordingEntry
         {
             public float _NoteStartTime = -1f;
             public float _NoteEndTime = -1f;
 
             public NoteInfo _NoteInfo;
+
+            public bool IsValid { 
+                get => (
+                _NoteStartTime >= 0
+                && _NoteEndTime >= _NoteStartTime
+                && _NoteInfo != null
+                );
+            }
         }
 
         #endregion
 
         private bool ValidateEntry(RecordingEntry entry)
         {
-            return (
-                entry._NoteStartTime > 0
-                && entry._NoteEndTime > 0
-                && entry._NoteInfo != null
-                );
+            return entry.IsValid;
         }
 
         /// <summary>
@@ -56,7 +61,7 @@ namespace NotePlayer
         {
             if (!ValidateEntry(entry))
             {
-                Debug.LogWarning(entry.ToString() + " Entry Invalid!");
+                Debug.LogWarning(entry.ToString() + " Entry Invalid!" + "\n start " + entry._NoteStartTime + "\n end " + entry._NoteEndTime + "\n info " + entry._NoteInfo);
                 return false;
             }
 
@@ -74,14 +79,14 @@ namespace NotePlayer
             float startTimestamp = List_RecordingEntries[0]._NoteStartTime;
             //List_RecordingEntries[0]._NoteStartTime = 0f;
 
-            foreach (var e in List_RecordingEntries)
+            foreach (RecordingEntry e in List_RecordingEntries)
             {
-                e._NoteStartTime = startTimestamp - e._NoteStartTime;
-                e._NoteEndTime = startTimestamp - e._NoteEndTime;
+                e._NoteStartTime = e._NoteStartTime - startTimestamp;
+                e._NoteEndTime = e._NoteEndTime - startTimestamp;
 
                 if(e._NoteStartTime < 0 || e._NoteEndTime < 0)
                 {
-                    throw new System.Exception("Invalid Recording timestamp data"); //no idea how this would get through but this makes this method safe
+                    throw new System.Exception("Invalid Recording timestamp data \n" + JsonUtility.ToJson(e, true)); //no idea how this would get through but this makes this method safe
                 }
             }
         }

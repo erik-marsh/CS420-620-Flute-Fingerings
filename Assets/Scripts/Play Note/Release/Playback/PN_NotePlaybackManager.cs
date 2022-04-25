@@ -59,6 +59,9 @@ namespace NotePlayer
             Dispose();
         }
 
+        /// <summary>
+        /// Free multithreading resources and cancel running asynchronous tasks
+        /// </summary>
         public void Dispose()
         {
             //cleanup multithreading
@@ -72,22 +75,40 @@ namespace NotePlayer
 
         protected async System.Threading.Tasks.Task Async_PlaybackRecording(System.Threading.CancellationToken cancelToken, PN_RecordingSession session)
         {
+            if (FLAG_Debug) Debug.Log("Playback started on session data: \n" + JsonUtility.ToJson(session));
+
+            string debugOutput = "Notes added { Name, RelativeStartTime }:\n";
+
             System.Threading.CancellationTokenSource cts = System.Threading.CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
 
             try
             {
                 int curNoteIndex = 0;
+                if (FLAG_Debug) Debug.Log("Entries count for session: " + session.List_RecordingEntries.Count.ToString());
                 while (!cancelToken.IsCancellationRequested && curNoteIndex < session.List_RecordingEntries.Count)
                 {
                     //play current note
                     PN_NotePlayer np = _Preset.CreateNotePlayer(session.List_RecordingEntries[curNoteIndex]._NoteInfo._Name);
                     np._NoteDuration = Mathf.Abs(session.List_RecordingEntries[curNoteIndex]._NoteStartTime - session.List_RecordingEntries[curNoteIndex]._NoteEndTime);
+                    
+                    //append to debug log
+                    if(FLAG_Debug)
+                    {
+                        debugOutput += "{ " + session.List_RecordingEntries[curNoteIndex]._NoteInfo._Name + ", " + session.List_RecordingEntries[curNoteIndex]._NoteStartTime + " }, ";
+                    }
 
                     //wait until next note
                     curNoteIndex++;
                     //TODO: investigate the 1ms delay
                     //1 added ms delay for some reason helps...
                     await System.Threading.Tasks.Task.Delay((int)(1000 * session.List_RecordingEntries[curNoteIndex]._NoteStartTime) + 1, cts.Token); 
+                }
+
+                if (FLAG_Debug)
+                {
+                    Debug.Log("note indices utilized for playback: " + curNoteIndex.ToString());
+                    Debug.Log("cancel requested: " + cancelToken.IsCancellationRequested.ToString());
+                    Debug.Log(debugOutput);
                 }
             }
             catch (System.OperationCanceledException)
@@ -112,9 +133,12 @@ namespace NotePlayer
             if (session == null) return false;
 
             //cancel any active playback thread(s)
-            _CancellationTokenSource.Cancel();
+            Dispose();
+
+            _CancellationTokenSource = new System.Threading.CancellationTokenSource();
 
             System.Threading.Tasks.Task t = Async_PlaybackRecording(_CancellationTokenSource.Token, session);
+
 
             return true;
         }
