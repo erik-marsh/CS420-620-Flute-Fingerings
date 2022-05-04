@@ -35,63 +35,53 @@ public class HandData : MonoBehaviour
         fingeringName.text = "";
         fingerThresholds = new float[10]
         {
-            170.0f,
-            158.0f,
-            145.0f,
-            120.0f,
-            157.0f,
+            30.0f, // LIndex
+            80.0f, // LMiddle
+            90.0f, // LRing
+            80.0f, // LPinky
+            157.0f, // LThumb
 
-            160.0f,
-            160.0f,
-            160.0f,
-            150.0f,
-            0.0f
+            45.0f, // RIndex
+            70.0f, // RMiddle
+            80.0f, // RRing
+            120.0f, // RPinky
+            0.0f    // RThumb
         };
     }
+
     private void Update()
     {
         timer += Time.deltaTime;
         if (timer <= updatePeriod) return;
 
         timer = 0.0f;
+
         // WARNING: this is heavily volatile - the finger array is assumed to be set up identically to Fingering.knownFingerings
         uint keyCombination = 0;
         for (int i = 0; i < texts.Length; i++)
         {
             var text = texts[i];
-            var finger = fingers[i];
-            // these are indexed starting at 1 for some reason
-            //float angle = finger.GetAngle(finger.mChildNodes[1], finger.mChildNodes[3], finger.mChildNodes[4]);
-            //text.text = angle.ToString("0.00");
 
-            float angle = 0.0f;
-            foreach (var node in finger.mChildNodes)
+            float angle;
+            bool isFingerActive = false;
+
+            // if the finger is a thumb
+            // different algorithms and predicates are needed for thumbs since the gloves track thumbs with 3-DOF angles
+            // but other fingers only have one angular DOF
+            if (i == 4 || i == 9)
             {
-                float normalizedAngle = node.Value.localEulerAngles.z;
-
-                // the right hand angles are the negative of the left hand angles
-                if (i >= 5) normalizedAngle = (360.0f - normalizedAngle);
-                if (i == 5)
-                    Debug.Log(node.Key + " " + normalizedAngle);
-
-                // the range of angles for finger joints in the editor is [-20, 89]
-                // unity does not use negative euler angles internally, so this range is actually the union of [340, 360] and [0, 89]
-                // hence, angles above 90 degrees get normalized to 0
-                if (normalizedAngle > 90.0f) normalizedAngle = 0.0f;
-
-                // just in case
-                if (normalizedAngle < 0.0f) normalizedAngle = 0.0f;
-
-                if (i == 5)
-                    Debug.Log(node.Key + " " + normalizedAngle);
-
-                angle += normalizedAngle;
+                angle = GetThumbAngle(i);
+                isFingerActive = angle < fingerThresholds[i];
+            }
+            else
+            {
+                angle = GetFingerAngle(i);
+                isFingerActive = angle > fingerThresholds[i];
             }
 
             text.text = angle.ToString("0.00");
 
-            // TODO: tbh the best way to go about this is having one threshold per finger, since the GetAngle gives different results depending on the finger
-            if (angle < fingerThresholds[i])
+            if (isFingerActive)
             {
                 text.color = Color.green;
                 UIFingerImages[i].color = Color.green;
@@ -134,5 +124,38 @@ public class HandData : MonoBehaviour
         }
 
         lastFingering = fingering;
+    }
+
+    private float GetFingerAngle(int fingerIndex)
+    {
+        var finger = fingers[fingerIndex];
+        float angle = 0.0f;
+
+        foreach (var node in finger.mChildNodes)
+        {
+            float normalizedAngle = node.Value.localEulerAngles.z;
+
+            // the right hand angles are the negative of the left hand angles
+            if (fingerIndex >= 5) normalizedAngle = (360.0f - normalizedAngle);
+
+            // the range of angles for finger joints in the editor is [-20, 89]
+            // unity does not use negative euler angles internally, so this range is actually the union of [340, 360] and [0, 89]
+            // hence, angles above 90 degrees get normalized to 0
+            if (normalizedAngle > 90.0f) normalizedAngle = 0.0f;
+
+            // just in case
+            if (normalizedAngle < 0.0f) normalizedAngle = 0.0f;
+
+            angle += normalizedAngle;
+        }
+
+        return angle;
+    }
+
+    private float GetThumbAngle(int fingerIndex)
+    {
+        var finger = fingers[fingerIndex];
+        // these are indexed starting at 1 for some reason
+        return finger.GetAngle(finger.mChildNodes[1], finger.mChildNodes[3], finger.mChildNodes[4]);
     }
 }
