@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MidiPlayerTK;
 
 using System.Threading.Tasks;
 
@@ -32,6 +33,11 @@ namespace NotePlayer
         /// internal cancellation token source for multithreading
         /// </summary>
         private System.Threading.CancellationTokenSource _CancellationTokenSource = new System.Threading.CancellationTokenSource();
+
+        /// <summary>
+        /// The MIDI note player for playback.
+        /// </summary>
+        public MidiStreamPlayer _MIDIPlayer;
 
         #endregion
 
@@ -90,16 +96,33 @@ namespace NotePlayer
                 float nextDelay_Seconds;
                 while (!cancelToken.IsCancellationRequested && curNoteIndex < session.List_RecordingEntries.Count)
                 {
-                    //play current note
-                    PN_NotePlayer np = _Preset.CreateNotePlayer(session.List_RecordingEntries[curNoteIndex]._NoteInfo._Name);
-                    np._NoteDuration = Mathf.Abs(session.List_RecordingEntries[curNoteIndex]._NoteStartTime - session.List_RecordingEntries[curNoteIndex]._NoteEndTime);
-                    
-                    //append to debug log
-                    if(FLAG_Debug)
-                    {
-                        debugOutput += "{ " + session.List_RecordingEntries[curNoteIndex]._NoteInfo._Name + ", " + session.List_RecordingEntries[curNoteIndex]._NoteStartTime + " }, ";
-                    }
+                    ////play current note
+                    //PN_NotePlayer np = _Preset.CreateNotePlayer(session.List_RecordingEntries[curNoteIndex]._NoteInfo._Name);
+                    //np._NoteDuration = Mathf.Abs(session.List_RecordingEntries[curNoteIndex]._NoteStartTime - session.List_RecordingEntries[curNoteIndex]._NoteEndTime);
 
+                    ////append to debug log
+                    //if(FLAG_Debug)
+                    //{
+                    //    debugOutput += "{ " + session.List_RecordingEntries[curNoteIndex]._NoteInfo._Name + ", " + session.List_RecordingEntries[curNoteIndex]._NoteStartTime + " }, ";
+                    //}
+
+                    if (_MIDIPlayer == null)
+                    {
+                        Debug.LogWarning("Cannot play note: no MIDI player is set for " + gameObject.name);
+                    }
+                    else
+                    {
+                        float noteDuration = Mathf.Abs(session.List_RecordingEntries[curNoteIndex]._NoteStartTime - session.List_RecordingEntries[curNoteIndex]._NoteEndTime);
+
+                        _MIDIPlayer.MPTK_PlayEvent(new MPTKEvent {
+                            Command = MPTKCommand.NoteOn,
+                            Value = session.List_RecordingEntries[curNoteIndex]._MIDINote,
+                            Channel = 0,
+                            Duration = (int)(noteDuration * 1000.0f), // MIDI durations are in milliseconds (and as an integer, which is weird)
+                            Velocity = 100,
+                            Delay = 0
+                        });
+                    }
 
                     //compute delay offset to next note
                     curNoteIndex++;

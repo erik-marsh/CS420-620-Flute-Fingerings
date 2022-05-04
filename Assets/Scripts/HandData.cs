@@ -25,8 +25,8 @@ public class HandData : MonoBehaviour
 
     private int lastFingerSet = 0;
 
-    public static event System.EventHandler<Utils.StringEventArgs> OnNoteStart;
-    public static event System.EventHandler<Utils.StringEventArgs> OnNoteEnd;
+    public static event System.EventHandler<Fingering> OnNoteStart;
+    public static event System.EventHandler<Fingering> OnNoteEnd;
 
     private Fingering lastFingering = Fingering.nullFingering;
 
@@ -123,14 +123,14 @@ public class HandData : MonoBehaviour
             // the timing will overlap a little here, unfortunately
             if (lastFingering != Fingering.nullFingering) // corrects a small error on startup
             {
-                OnNoteEnd?.Invoke(this, new Utils.StringEventArgs(lastFingering.name));
+                OnNoteEnd?.Invoke(this, lastFingering);
             }
 
             // if we have moved to a new (non-null) fingering
             // null fingerings do not make sounds that we care about for this project, so we ignore them
             if (fingering != Fingering.nullFingering)
             {
-                OnNoteStart?.Invoke(this, new Utils.StringEventArgs(fingering.name));
+                OnNoteStart?.Invoke(this, fingering);
             }
         }
 

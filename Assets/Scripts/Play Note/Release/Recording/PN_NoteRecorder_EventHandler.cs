@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace NotePlayer
@@ -93,8 +94,8 @@ namespace NotePlayer
             PN_TestEventDispatcher.OnNoteStart += PN_TestEventDispatcher_OnNoteStart; 
             PN_TestEventDispatcher.OnNoteEnd += PN_TestEventDispatcher_OnNoteEnd;
 
-            HandData.OnNoteStart += PN_TestEventDispatcher_OnNoteStart;
-            HandData.OnNoteEnd += PN_TestEventDispatcher_OnNoteEnd;
+            HandData.OnNoteStart += HandData_OnNoteStart;
+            HandData.OnNoteEnd += HandData_OnNoteEnd;
         }
 
         private void OnDisable()
@@ -102,8 +103,8 @@ namespace NotePlayer
             PN_TestEventDispatcher.OnNoteStart -= PN_TestEventDispatcher_OnNoteStart;
             PN_TestEventDispatcher.OnNoteEnd -= PN_TestEventDispatcher_OnNoteEnd;
 
-            HandData.OnNoteStart -= PN_TestEventDispatcher_OnNoteStart;
-            HandData.OnNoteEnd -= PN_TestEventDispatcher_OnNoteEnd;
+            HandData.OnNoteStart -= HandData_OnNoteStart;
+            HandData.OnNoteEnd -= HandData_OnNoteEnd;
         }
 
         #endregion
@@ -132,15 +133,41 @@ namespace NotePlayer
             if (FLAG_Debug)
                 Debug.Log("Invoking " + nameof(PN_TestEventDispatcher_OnNoteStart) + " with arg " + e._Name + " (sent by " + sender.GetType() + ")");
 
-            // store prev note if one exists
+            //// store prev note if one exists
+            //StoreActiveNote();
+
+            //CurrentActiveNote = new PN_RecordingSession.RecordingEntry();
+            //CurrentActiveNote._NoteStartTime = Time.time;
+            //CurrentActiveNote._NoteInfo = _Preset.RetrieveNoteInfo(e._Name);
+
+            ////if the note info doesnt exist in our preset discard this active note.
+            //if (CurrentActiveNote._NoteInfo == null) CurrentActiveNote = null;
+        }
+
+        private void HandData_OnNoteStart(object sender, Fingering fingering)
+        {
+            if (FLAG_Debug)
+                Debug.Log("Invoking " + nameof(HandData_OnNoteStart) + " with arg " + fingering.name + " (sent by " + sender.GetType() + ")");
+
             StoreActiveNote();
 
             CurrentActiveNote = new PN_RecordingSession.RecordingEntry();
             CurrentActiveNote._NoteStartTime = Time.time;
-            CurrentActiveNote._NoteInfo = _Preset.RetrieveNoteInfo(e._Name);
+            CurrentActiveNote._MIDINote = fingering.midiNote; // principal offender
 
-            //if the note info doesnt exist in our preset discard this active note.
-            if (CurrentActiveNote._NoteInfo == null) CurrentActiveNote = null;
+            // if we were given a null fingering (somehow), discard this active note
+            if (CurrentActiveNote._MIDINote == -1) CurrentActiveNote = null;
+        }
+
+        private void HandData_OnNoteEnd(object sender, Fingering fingering)
+        {
+            if (FLAG_Debug)
+                Debug.Log("Invoking " + nameof(PN_TestEventDispatcher_OnNoteEnd) + " with arg " + fingering.name + " (sent by " + sender.GetType() + ")");
+
+            if (CurrentActiveNote == null) return;
+
+            CurrentActiveNote._NoteEndTime = Time.time;
+            StoreActiveNote();
         }
 
         #endregion
@@ -181,6 +208,8 @@ namespace NotePlayer
             StopRecording();
 
             ActiveRecordingSession = new PN_RecordingSession();
+
+            if (FLAG_Debug) Debug.Log("Recording started.");
         }
 
         /// <summary>
@@ -191,6 +220,32 @@ namespace NotePlayer
             if (ActiveRecordingSession == null) return;
 
             StoreCurrentSession();
+
+            if (FLAG_Debug) Debug.Log("Recording stopped.");
+        }
+
+        /// <summary>
+        /// Sets whether or not to start or stop a recording.
+        /// Used with the Unity UI system.
+        /// </summary>
+        /// <param name="active"></param>
+        public void ToggleRecording()
+        {
+            if (IsRecording)
+                StopRecording();
+            else
+                StartRecording();
+        }
+
+        public PN_NotePlaybackManager playbackManager;
+
+        /// <summary>
+        /// Plays the most recent recording.
+        /// Used with the Unity UI system.
+        /// </summary>
+        public void PlayMostRecentRecording()
+        {
+            playbackManager.PlayRecordingSession(PreviousRecordingSessions.ElementAt(PreviousRecordingSessions.Count - 1));
         }
 
         #endregion

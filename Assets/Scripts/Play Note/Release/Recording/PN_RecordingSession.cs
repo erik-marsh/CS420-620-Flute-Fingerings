@@ -24,13 +24,25 @@ namespace NotePlayer
             public float _NoteStartTime = -1f;
             public float _NoteEndTime = -1f;
 
-            public NoteInfo _NoteInfo;
+            // deprecated, we want to use a MIDI note value instead (Erik)
+            //public NoteInfo _NoteInfo;
 
-            public bool IsValid { 
+            // a bit too C-like for my liking but i'll roll with it for now (Erik)
+            public int _MIDINote = -1;
+
+            //public bool IsValid { 
+            //    get => (
+            //    _NoteStartTime >= 0
+            //    && _NoteEndTime >= _NoteStartTime
+            //    && _NoteInfo != null
+            //    );
+            //}
+
+            public bool IsValid {
                 get => (
-                _NoteStartTime >= 0
-                && _NoteEndTime >= _NoteStartTime
-                && _NoteInfo != null
+                    _NoteStartTime >= 0
+                    && _NoteEndTime >= _NoteStartTime
+                    && _MIDINote != -1
                 );
             }
         }
@@ -61,7 +73,8 @@ namespace NotePlayer
         {
             if (!ValidateEntry(entry))
             {
-                Debug.LogWarning(entry.ToString() + " Entry Invalid!" + "\n start " + entry._NoteStartTime + "\n end " + entry._NoteEndTime + "\n info " + entry._NoteInfo);
+                //Debug.LogWarning(entry.ToString() + " Entry Invalid!" + "\n start " + entry._NoteStartTime + "\n end " + entry._NoteEndTime + "\n info " + entry._NoteInfo);
+                Debug.LogWarning(entry.ToString() + " Entry Invalid!" + "\n start " + entry._NoteStartTime + "\n end " + entry._NoteEndTime + "\n MIDI note " + entry._MIDINote);
                 return false;
             }
 
