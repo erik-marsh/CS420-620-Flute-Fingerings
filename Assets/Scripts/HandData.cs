@@ -61,35 +61,34 @@ public class HandData : MonoBehaviour
             var text = texts[i];
             var finger = fingers[i];
             // these are indexed starting at 1 for some reason
-            float angle = finger.GetAngle(finger.mChildNodes[1], finger.mChildNodes[3], finger.mChildNodes[4]);
-            text.text = angle.ToString("0.00");
+            //float angle = finger.GetAngle(finger.mChildNodes[1], finger.mChildNodes[3], finger.mChildNodes[4]);
+            //text.text = angle.ToString("0.00");
 
-            if (i == 0)
+            float angle = 0.0f;
+            foreach (var node in finger.mChildNodes)
             {
-                foreach (var node in finger.mChildNodes)
-                {
-                    //Debug.Log(node.Value.gameObject.name);
-                    //Debug.DrawRay(node.Value.position, Vector3.up, Color.red, updatePeriod);
-                }
+                float normalizedAngle = node.Value.localEulerAngles.z;
 
-                //Debug.DrawRay(fingerReferenceNodes[i].transform.position, Vector3.up, Color.blue, updatePeriod);
-                //Debug.Log(Vector3.Angle(
-                //    finger.mChildNodes[1].position - fingerReferenceNodes[i].position,
-                //    finger.mChildNodes[4].position - fingerReferenceNodes[i].position
-                //));
+                // the right hand angles are the negative of the left hand angles
+                if (i >= 5) normalizedAngle = (360.0f - normalizedAngle);
+                if (i == 5)
+                    Debug.Log(node.Key + " " + normalizedAngle);
 
-                //Debug.DrawRay(fingerReferenceNodes[i].position, (finger.mChildNodes[1].position - fingerReferenceNodes[i].position) * 10.0f, Color.red, updatePeriod);
-                //Debug.DrawRay(fingerReferenceNodes[i].position, (finger.mChildNodes[4].localPosition - fingerReferenceNodes[i].localPosition) * 10.0f, Color.blue, updatePeriod);
+                // the range of angles for finger joints in the editor is [-20, 89]
+                // unity does not use negative euler angles internally, so this range is actually the union of [340, 360] and [0, 89]
+                // hence, angles above 90 degrees get normalized to 0
+                if (normalizedAngle > 90.0f) normalizedAngle = 0.0f;
+
+                // just in case
+                if (normalizedAngle < 0.0f) normalizedAngle = 0.0f;
+
+                if (i == 5)
+                    Debug.Log(node.Key + " " + normalizedAngle);
+
+                angle += normalizedAngle;
             }
 
-
-            // test different algo
-            // this one might be a good choice for the LH Index because of how my fingers like to bend
-            //angle = Vector3.Angle(
-            //    finger.mChildNodes[1].position - fingerReferenceNodes[i].position,
-            //    finger.mChildNodes[4].position - fingerReferenceNodes[i].position
-            //);
-            //text.text = angle.ToString("0.00");
+            text.text = angle.ToString("0.00");
 
             // TODO: tbh the best way to go about this is having one threshold per finger, since the GetAngle gives different results depending on the finger
             if (angle < fingerThresholds[i])
