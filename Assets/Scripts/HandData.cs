@@ -15,6 +15,7 @@ public class HandData : MonoBehaviour
     public Text fingeringName;
     //public Hi5_Hand_Collider_Visible_Thumb_Finger[] thumbs;
     public Image[] UIFingerImages;
+    public Image[] FingeringDiagramImages;
     public Hi5_Hand_Visible_Finger[] fingersVisible;
     public Hi5_Glove_Interaction_Finger[] fingers;
     public Transform[] fingerReferenceNodes;
@@ -85,12 +86,16 @@ public class HandData : MonoBehaviour
             {
                 text.color = Color.green;
                 UIFingerImages[i].color = Color.green;
+                if (FingeringDiagramImages[i])
+                    FingeringDiagramImages[i].color = Color.green;
                 keyCombination |= (uint)1 << i;
             }
             else
             {
                 text.color = Color.black;
                 UIFingerImages[i].color = Color.white;
+                if (FingeringDiagramImages[i])
+                    FingeringDiagramImages[i].color = Color.white;
             }
         }
 
