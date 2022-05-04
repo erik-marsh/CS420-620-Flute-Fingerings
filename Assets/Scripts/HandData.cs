@@ -25,6 +25,11 @@ public class HandData : MonoBehaviour
 
     private int lastFingerSet = 0;
 
+    public static event System.EventHandler<Utils.StringEventArgs> OnNoteStart;
+    public static event System.EventHandler<Utils.StringEventArgs> OnNoteEnd;
+
+    private Fingering lastFingering = Fingering.nullFingering;
+
     private void Awake()
     {
         fingeringName.text = "";
@@ -43,7 +48,6 @@ public class HandData : MonoBehaviour
             0.0f
         };
     }
-
     private void Update()
     {
         timer += Time.deltaTime;
@@ -64,18 +68,18 @@ public class HandData : MonoBehaviour
             {
                 foreach (var node in finger.mChildNodes)
                 {
-                    Debug.Log(node.Value.gameObject.name);
+                    //Debug.Log(node.Value.gameObject.name);
                     //Debug.DrawRay(node.Value.position, Vector3.up, Color.red, updatePeriod);
                 }
 
                 //Debug.DrawRay(fingerReferenceNodes[i].transform.position, Vector3.up, Color.blue, updatePeriod);
-                Debug.Log(Vector3.Angle(
-                    finger.mChildNodes[1].position - fingerReferenceNodes[i].position,
-                    finger.mChildNodes[4].position - fingerReferenceNodes[i].position
-                ));
+                //Debug.Log(Vector3.Angle(
+                //    finger.mChildNodes[1].position - fingerReferenceNodes[i].position,
+                //    finger.mChildNodes[4].position - fingerReferenceNodes[i].position
+                //));
 
-                Debug.DrawRay(fingerReferenceNodes[i].position, (finger.mChildNodes[1].position - fingerReferenceNodes[i].position) * 10.0f, Color.red, updatePeriod);
-                Debug.DrawRay(fingerReferenceNodes[i].position, (finger.mChildNodes[4].localPosition - fingerReferenceNodes[i].localPosition) * 10.0f, Color.blue, updatePeriod);
+                //Debug.DrawRay(fingerReferenceNodes[i].position, (finger.mChildNodes[1].position - fingerReferenceNodes[i].position) * 10.0f, Color.red, updatePeriod);
+                //Debug.DrawRay(fingerReferenceNodes[i].position, (finger.mChildNodes[4].localPosition - fingerReferenceNodes[i].localPosition) * 10.0f, Color.blue, updatePeriod);
             }
 
 
@@ -103,8 +107,33 @@ public class HandData : MonoBehaviour
 
         var fingering = Fingering.GetFingeringByCombination(keyCombination);
         fingeringName.text = "Detected: ";
-        if (fingering != Fingering.nullFingering)
-            fingeringName.text += fingering.name + " (" + fingering.frequency.ToString("0.00") + "Hz)";
         pianoRoll.SetKey(fingering.midiNote);
+
+        if (fingering != Fingering.nullFingering)
+        {
+            fingeringName.text += fingering.name + " (" + fingering.frequency.ToString("0.00") + "Hz)";
+        }
+
+        // the fingerings are all retrieved from a static array, so object equality should work for this
+        if (fingering != lastFingering)
+        {
+            // any time the fingering changes, end a note
+            // even if the new fingering is the null fingering
+            // null fingerings would change the sound being produced
+            // the timing will overlap a little here, unfortunately
+            if (lastFingering != Fingering.nullFingering) // corrects a small error on startup
+            {
+                OnNoteEnd?.Invoke(this, new Utils.StringEventArgs(lastFingering.name));
+            }
+
+            // if we have moved to a new (non-null) fingering
+            // null fingerings do not make sounds that we care about for this project, so we ignore them
+            if (fingering != Fingering.nullFingering)
+            {
+                OnNoteStart?.Invoke(this, new Utils.StringEventArgs(fingering.name));
+            }
+        }
+
+        lastFingering = fingering;
     }
 }

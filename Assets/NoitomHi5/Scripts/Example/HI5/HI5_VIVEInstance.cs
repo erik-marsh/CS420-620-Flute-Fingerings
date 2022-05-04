@@ -56,7 +56,7 @@ using HI5.VRCalibration;
 
         new void Update()
         {
-            Debug.Log(m_Status.Status);
+            //Debug.Log(m_Status.Status);
 
             base.Update();
             //ruige 2018 3 27
@@ -96,7 +96,7 @@ using HI5.VRCalibration;
             isBinded = true;
             bool isBposSuccess = HI5_Manager.GetGloveStatus().isGloveBPosSuccess();
 
-            Debug.Log("CheckIsValid => isAvailable: " + isAvailable + " && isBinded: " + isBinded + " && isBposSuccess: " + isBposSuccess);
+            //Debug.Log("CheckIsValid => isAvailable: " + isAvailable + " && isBinded: " + isBinded + " && isBposSuccess: " + isBposSuccess);
 
             if (isAvailable && isBinded && isBposSuccess)
             {

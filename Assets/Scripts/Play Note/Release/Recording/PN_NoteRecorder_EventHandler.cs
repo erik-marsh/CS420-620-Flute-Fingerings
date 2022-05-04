@@ -92,12 +92,18 @@ namespace NotePlayer
         {
             PN_TestEventDispatcher.OnNoteStart += PN_TestEventDispatcher_OnNoteStart; 
             PN_TestEventDispatcher.OnNoteEnd += PN_TestEventDispatcher_OnNoteEnd;
+
+            HandData.OnNoteStart += PN_TestEventDispatcher_OnNoteStart;
+            HandData.OnNoteEnd += PN_TestEventDispatcher_OnNoteEnd;
         }
 
         private void OnDisable()
         {
             PN_TestEventDispatcher.OnNoteStart -= PN_TestEventDispatcher_OnNoteStart;
             PN_TestEventDispatcher.OnNoteEnd -= PN_TestEventDispatcher_OnNoteEnd;
+
+            HandData.OnNoteStart -= PN_TestEventDispatcher_OnNoteStart;
+            HandData.OnNoteEnd -= PN_TestEventDispatcher_OnNoteEnd;
         }
 
         #endregion
@@ -109,6 +115,9 @@ namespace NotePlayer
         /// </summary>
         private void PN_TestEventDispatcher_OnNoteEnd(object sender, Utils.StringEventArgs e)
         {
+            if (FLAG_Debug)
+                Debug.Log("Invoking " + nameof(PN_TestEventDispatcher_OnNoteEnd) + " with arg " + e._Name + " (sent by " + sender.GetType() + ")");
+
             if (CurrentActiveNote == null) return;
 
             CurrentActiveNote._NoteEndTime = Time.time;
@@ -120,6 +129,9 @@ namespace NotePlayer
         /// </summary>
         private void PN_TestEventDispatcher_OnNoteStart(object sender, Utils.StringEventArgs e)
         {
+            if (FLAG_Debug)
+                Debug.Log("Invoking " + nameof(PN_TestEventDispatcher_OnNoteStart) + " with arg " + e._Name + " (sent by " + sender.GetType() + ")");
+
             // store prev note if one exists
             StoreActiveNote();
 
