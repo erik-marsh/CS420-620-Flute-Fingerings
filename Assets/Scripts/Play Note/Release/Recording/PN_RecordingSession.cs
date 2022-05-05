@@ -13,6 +13,15 @@ namespace NotePlayer
     /// </remarks>
     public class PN_RecordingSession
     {
+        private static int currRecordingID = 0;
+        public int recordingID;
+
+        public PN_RecordingSession()
+        {
+            recordingID = currRecordingID;
+            currRecordingID++;
+        }
+
         [field: SerializeField]
         public List<RecordingEntry> List_RecordingEntries { get; private set; } = new List<RecordingEntry>();
 

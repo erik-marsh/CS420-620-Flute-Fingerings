@@ -41,6 +41,10 @@ namespace NotePlayer
 
         #endregion
 
+        #region Events
+        public static event System.EventHandler OnPlaybackStopped;
+        #endregion
+
         #region Initialization
 
         private void Awake()
@@ -153,6 +157,9 @@ namespace NotePlayer
             {
                 if (FLAG_Debug) Debug.Log(ToString() + ": Disposal of Cancellation Token Source!");
                 cts.Dispose();
+
+                // invoke event
+                OnPlaybackStopped?.Invoke(this, new System.EventArgs());
             }
         }
 
@@ -186,6 +193,9 @@ namespace NotePlayer
         {
             Dispose();
             //_CancellationTokenSource = new System.Threading.CancellationTokenSource();
+
+            // invoke event
+            OnPlaybackStopped?.Invoke(this, new System.EventArgs());
 
             return true;
         }
