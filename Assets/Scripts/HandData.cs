@@ -5,51 +5,85 @@ using UnityEngine.UI;
 using TMPro;
 using Hi5_Interaction_Core;
 
+/// <summary>
+/// Class that manages and interprets input from the gloves.
+/// </summary>
 public class HandData : MonoBehaviour
 {
-    // every list should have the fingers in the correct order:
+    #region UI References
+    // every array should have the fingers in the correct order:
     // LIndex, LMiddle, LRing, LPinky, LThumb, RIndex, RMiddle, RRing, RPinky, RThumb
-
     public PianoRoll pianoRoll;
-    public Text[] texts;
     public Text fingeringName;
-    //public Hi5_Hand_Collider_Visible_Thumb_Finger[] thumbs;
+    public Text[] texts;
     public Image[] UIFingerImages;
     public Image[] FingeringDiagramImages;
-    public Hi5_Hand_Visible_Finger[] fingersVisible;
-    public Hi5_Glove_Interaction_Finger[] fingers;
-    public Transform[] fingerReferenceNodes;
-    private float[] fingerThresholds = new float[10];
+    #endregion
 
+    #region Script Parameters
+    [Tooltip("How often the angles should update (in seconds)")]
     public float updatePeriod = 0.5f;
+
+    public Color activatedColor = Color.green;
+    public Color textInactiveColor = Color.black;
+    public Color imageInactiveColor = Color.white;
+    #endregion
+
+    #region Members
     private float timer = 0.0f;
-
-    private int lastFingerSet = 0;
-
-    public static event System.EventHandler<Fingering> OnNoteStart;
-    public static event System.EventHandler<Fingering> OnNoteEnd;
 
     private Fingering lastFingering = Fingering.nullFingering;
 
+    public Hi5_Glove_Interaction_Finger[] fingers;
+    #endregion
+
+    #region Static Data
+    /// <summary>
+    /// Thresholds for finger activation and deactivation.
+    /// RThumb is unused, since that thumb does not press any keys on the flute.
+    /// </summary>
+    private static float[] fingerThresholds = new float[10]
+    {
+        30.0f, // LIndex
+        80.0f, // LMiddle
+        90.0f, // LRing
+        80.0f, // LPinky
+        157.0f, // LThumb
+
+        45.0f, // RIndex
+        70.0f, // RMiddle
+        80.0f, // RRing
+        120.0f, // RPinky
+        0.0f    // RThumb
+    };
+    #endregion
+
+    #region Events
+    /// <summary>
+    /// Invoked when a new valid fingering is detected.
+    /// Passes the new note to the event handlers.
+    /// </summary>
+    public static event System.EventHandler<Fingering> OnNoteStart;
+
+    /// <summary>
+    /// Invoked when a new fingering is detected (valid or invalid).
+    /// Passes the ended note to the event handlers.
+    /// </summary>
+    public static event System.EventHandler<Fingering> OnNoteEnd;
+    #endregion
+
+    #region Initialization
     private void Awake()
     {
         fingeringName.text = "";
-        fingerThresholds = new float[10]
-        {
-            30.0f, // LIndex
-            80.0f, // LMiddle
-            90.0f, // LRing
-            80.0f, // LPinky
-            157.0f, // LThumb
-
-            45.0f, // RIndex
-            70.0f, // RMiddle
-            80.0f, // RRing
-            120.0f, // RPinky
-            0.0f    // RThumb
-        };
     }
+    #endregion
 
+    #region Main Logic
+    /// <summary>
+    /// The main logic loop. Executes every updatePeriod.
+    /// Measures the angle of each finger and determines if that finger is pressing a key.
+    /// </summary>
     private void Update()
     {
         timer += Time.deltaTime;
@@ -57,14 +91,13 @@ public class HandData : MonoBehaviour
 
         timer = 0.0f;
 
-        // WARNING: this is heavily volatile - the finger array is assumed to be set up identically to Fingering.knownFingerings
         uint keyCombination = 0;
-        for (int i = 0; i < texts.Length; i++)
+        // WARNING: this is heavily volatile - the finger array is assumed to be set up identically to Fingering.knownFingerings
+        // subtracting 1 because RThumb (i == 9) is not used for fingerings
+        for (int i = 0; i < texts.Length - 1; i++)
         {
-            var text = texts[i];
-
             float angle;
-            bool isFingerActive = false;
+            bool isFingerActive;
 
             // if the finger is a thumb
             // different algorithms and predicates are needed for thumbs since the gloves track thumbs with 3-DOF angles
@@ -80,32 +113,31 @@ public class HandData : MonoBehaviour
                 isFingerActive = angle > fingerThresholds[i];
             }
 
-            text.text = angle.ToString("0.00");
+            texts[i].text = angle.ToString("0.00");
 
             if (isFingerActive)
             {
-                text.color = Color.green;
-                UIFingerImages[i].color = Color.green;
-                if (FingeringDiagramImages[i])
-                    FingeringDiagramImages[i].color = Color.green;
+                texts[i].color = activatedColor;
+                UIFingerImages[i].color = activatedColor;
+                FingeringDiagramImages[i].color = activatedColor;
+
                 keyCombination |= (uint)1 << i;
             }
             else
             {
-                text.color = Color.black;
-                UIFingerImages[i].color = Color.white;
-                if (FingeringDiagramImages[i])
-                    FingeringDiagramImages[i].color = Color.white;
+                texts[i].color = textInactiveColor;
+                UIFingerImages[i].color = imageInactiveColor;
+                FingeringDiagramImages[i].color = imageInactiveColor;
             }
         }
 
         var fingering = Fingering.GetFingeringByCombination(keyCombination);
-        fingeringName.text = "Detected: ";
+        fingeringName.text = "No note detected.";
         pianoRoll.SetKey(fingering.midiNote);
 
         if (fingering != Fingering.nullFingering)
         {
-            fingeringName.text += fingering.name + " (" + fingering.frequency.ToString("0.00") + "Hz)";
+            fingeringName.text = fingering.name + " (" + fingering.frequency.ToString("0.00") + "Hz)";
         }
 
         // the fingerings are all retrieved from a static array, so object equality should work for this
@@ -130,7 +162,14 @@ public class HandData : MonoBehaviour
 
         lastFingering = fingering;
     }
+    #endregion
 
+    #region Helpers
+    /// <summary>
+    /// Sums the z angles of each finger joint and returns that sum.
+    /// </summary>
+    /// <param name="fingerIndex">The finger to measure.</param>
+    /// <returns></returns>
     private float GetFingerAngle(int fingerIndex)
     {
         var finger = fingers[fingerIndex];
@@ -157,10 +196,16 @@ public class HandData : MonoBehaviour
         return angle;
     }
 
+    /// <summary>
+    /// Uses the default Hi5 angle measurement and returns that value.
+    /// </summary>
+    /// <param name="fingerIndex">The finger to measure.</param>
+    /// <returns></returns>
     private float GetThumbAngle(int fingerIndex)
     {
         var finger = fingers[fingerIndex];
         // these are indexed starting at 1 for some reason
         return finger.GetAngle(finger.mChildNodes[1], finger.mChildNodes[3], finger.mChildNodes[4]);
     }
+    #endregion
 }

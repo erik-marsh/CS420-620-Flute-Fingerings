@@ -3,21 +3,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Object that shows notes on a piano roll.
+/// </summary>
 public class PianoRoll : MonoBehaviour
 {
+    #region GameObject References
     public RectTransform rectTransform;
     [Tooltip("Shows the extents in which the piano roll will be created")]
     public Image pianoRollPlaceholder;
-
-    public GameObject whiteKey;
-    public GameObject blackKey;
     public Text lowKeyText;
     public Text highKeyText;
+    #endregion
 
+    #region Prefab References
+    public GameObject whiteKey;
+    public GameObject blackKey;
+    #endregion
+
+    #region Parameter Variables
+    [Tooltip("The MIDI value of the first note on the piano roll.")]
     public int startNote = 62;
+
+    [Tooltip("The number of semitones above startNote that the piano roll will extend to.")]
     public int semitoneSpan = 25;
+
     [Tooltip("The sum of the left and right margins of the keys")]
     public float keyMargins = 1.0f;
+    #endregion
+
+    #region UI State
     [SerializeField]
     private float keyWidth = 25.0f;
     [SerializeField]
@@ -29,7 +44,12 @@ public class PianoRoll : MonoBehaviour
 
     private List<GameObject> keyObjects = new List<GameObject>();
     private int lastSetKeyIndex = 0;
+    #endregion
 
+    #region Initialization
+    /// <summary>
+    /// Sets up each key of the piano roll and the corresponding key labels.
+    /// </summary>
     private void Start()
     {
         pianoRollPlaceholder.enabled = false;
@@ -65,7 +85,9 @@ public class PianoRoll : MonoBehaviour
         float highKeyYOffset = IsWhiteKey(startNote + semitoneSpan - 1) ? keyHeight : keyHeight - 20.0f;
         highKeyText.transform.position = keyObjects[semitoneSpan - 1].transform.position + new Vector3(0.0f, highKeyYOffset, 0.0f);
     }
+    #endregion
 
+    #region Helpers
     /// <summary>
     /// Sets a key on the piano keyboard to be green.
     /// Giving this function -1 as a parameter will reset it (by convention).
@@ -86,7 +108,9 @@ public class PianoRoll : MonoBehaviour
         keyImage.color = Color.green;
         lastSetKeyIndex = keyIndex;
     }
+    #endregion
 
+    #region Static Helpers
     /// <summary>
     /// Returns whether or not the given MIDI note is a white key on a piano.
     /// </summary>
@@ -108,4 +132,5 @@ public class PianoRoll : MonoBehaviour
                 return false;
         }
     }
+    #endregion
 }

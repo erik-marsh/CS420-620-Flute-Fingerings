@@ -3,13 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
+/// <summary>
+/// Class that defines an association between fingering keypresses, note names, note frequencies, and MIDI note values.
+/// </summary>
 public class Fingering
 {
+    #region Members
     public string name;
     public float frequency;
     public int midiNote;
     public uint keyCombination;
+    #endregion
 
+    #region Constructors
     public Fingering(string name, float frequency, int midiNote, uint keyCombination)
     {
         this.name = name;
@@ -17,9 +23,10 @@ public class Fingering
         this.midiNote = midiNote;
         this.keyCombination = keyCombination;
     }
+    #endregion
 
     #region Static Data
-    // could have been an enum but it just made the fingering assignment way too verbose
+    // defines the bitmap for fingerings
     public static uint LIndex = 1 << 0;
     public static uint LMiddle = 1 << 1;
     public static uint LRing = 1 << 2;
@@ -31,7 +38,10 @@ public class Fingering
     public static uint RPinky = 1 << 8;
     public static uint RThumb = 1 << 9;
 
-
+    /// <summary>
+    /// List of fingerints known to the application.
+    /// Static to ensure equality tests will work.
+    /// </summary>
     public static Fingering[] knownFingerings = {
         // first octave
         new Fingering("D4",  293.66f, 62, LThumb | LIndex | LMiddle | LRing | RIndex | RMiddle | RRing),
@@ -79,6 +89,11 @@ public class Fingering
     #endregion
 
     #region Static Helpers
+    /// <summary>
+    /// Returns the first known fingering with a specified key combination.
+    /// </summary>
+    /// <param name="keyCombination"></param>
+    /// <returns></returns>
     public static Fingering GetFingeringByCombination(uint keyCombination)
     {
         // correction to ignore the right thumb, since it doesn't actually press keys
@@ -97,6 +112,11 @@ public class Fingering
         return res;
     }
 
+    /// <summary>
+    /// Returns the first known fingering with the specified name.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public static Fingering GetFingeringByName(string name)
     {
         Fingering res = nullFingering;
@@ -109,6 +129,11 @@ public class Fingering
         return res;
     }
 
+    /// <summary>
+    /// Returns the first known fingering with the specified name.
+    /// </summary>
+    /// <param name="midiNote"></param>
+    /// <returns></returns>
     public static Fingering GetFingeringByMIDINote(int midiNote)
     {
         Fingering res = nullFingering;
