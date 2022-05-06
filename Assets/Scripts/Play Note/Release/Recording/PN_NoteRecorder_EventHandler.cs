@@ -112,38 +112,29 @@ namespace NotePlayer
         #region Event Handlers
 
         /// <summary>
-        /// Stores the current <see cref="PN_RecordingSession.RecordingEntry"/> to the <see cref="ActiveRecordingSession"/>
-        /// </summary>
-        private void PN_TestEventDispatcher_OnNoteEnd(object sender, Utils.StringEventArgs e)
-        {
-            if (FLAG_Debug)
-                Debug.Log("Invoking " + nameof(PN_TestEventDispatcher_OnNoteEnd) + " with arg " + e._Name + " (sent by " + sender.GetType() + ")");
-
-            if (CurrentActiveNote == null) return;
-
-            CurrentActiveNote._NoteEndTime = Time.time;
-            StoreActiveNote();
-        }
-
-        /// <summary>
         /// Creates a new <see cref="PN_RecordingSession.RecordingEntry"/> and holds it in this Component's field buffer.
+        /// Used with the testing dispatcher.
         /// </summary>
         private void PN_TestEventDispatcher_OnNoteStart(object sender, Utils.StringEventArgs e)
         {
             if (FLAG_Debug)
                 Debug.Log("Invoking " + nameof(PN_TestEventDispatcher_OnNoteStart) + " with arg " + e._Name + " (sent by " + sender.GetType() + ")");
 
-            //// store prev note if one exists
-            //StoreActiveNote();
+            // store prev note if one exists
+            StoreActiveNote();
 
-            //CurrentActiveNote = new PN_RecordingSession.RecordingEntry();
-            //CurrentActiveNote._NoteStartTime = Time.time;
-            //CurrentActiveNote._NoteInfo = _Preset.RetrieveNoteInfo(e._Name);
+            CurrentActiveNote = new PN_RecordingSession.RecordingEntry();
+            CurrentActiveNote._NoteStartTime = Time.time;
+            CurrentActiveNote._MIDINote = Fingering.GetFingeringByName(e._Name).midiNote;
 
-            ////if the note info doesnt exist in our preset discard this active note.
-            //if (CurrentActiveNote._NoteInfo == null) CurrentActiveNote = null;
+            //if the note info doesnt exist in our preset discard this active note.
+            if (CurrentActiveNote._MIDINote == -1) CurrentActiveNote = null;
         }
 
+        /// <summary>
+        /// Creates a new <see cref="PN_RecordingSession.RecordingEntry"/> and holds it in this Component's field buffer.
+        /// Used with the glove-driven event dispatcher.
+        /// </summary>
         private void HandData_OnNoteStart(object sender, Fingering fingering)
         {
             if (FLAG_Debug)
@@ -158,11 +149,29 @@ namespace NotePlayer
             // if we were given a null fingering (somehow), discard this active note
             if (CurrentActiveNote._MIDINote == -1) CurrentActiveNote = null;
         }
+        /// <summary>
+        /// Stores the current <see cref="PN_RecordingSession.RecordingEntry"/> to the <see cref="ActiveRecordingSession"/>
+        /// Used with the testing dispatcher.
+        /// </summary>
+        private void PN_TestEventDispatcher_OnNoteEnd(object sender, Utils.StringEventArgs e)
+        {
+            if (FLAG_Debug)
+                Debug.Log("Invoking " + nameof(PN_TestEventDispatcher_OnNoteEnd) + " with arg " + e._Name + " (sent by " + sender.GetType() + ")");
 
+            if (CurrentActiveNote == null) return;
+
+            CurrentActiveNote._NoteEndTime = Time.time;
+            StoreActiveNote();
+        }
+
+        /// <summary>
+        /// Stores the current <see cref="PN_RecordingSession.RecordingEntry"/> to the <see cref="ActiveRecordingSession"/>
+        /// Used with the glove-driven event dispatcher.
+        /// </summary>
         private void HandData_OnNoteEnd(object sender, Fingering fingering)
         {
             if (FLAG_Debug)
-                Debug.Log("Invoking " + nameof(PN_TestEventDispatcher_OnNoteEnd) + " with arg " + fingering.name + " (sent by " + sender.GetType() + ")");
+                Debug.Log("Invoking " + nameof(HandData_OnNoteEnd) + " with arg " + fingering.name + " (sent by " + sender.GetType() + ")");
 
             if (CurrentActiveNote == null) return;
 
@@ -184,6 +193,7 @@ namespace NotePlayer
             ActiveRecordingSession.AddEntry(CurrentActiveNote);
             CurrentActiveNote = null;
         }
+
         private void StoreCurrentSession()
         {
             //nullify absolute-time from this recording session. (instead, it will be expressed as base-offset time where startTime is t=0)
@@ -225,29 +235,7 @@ namespace NotePlayer
             if (FLAG_Debug) Debug.Log("Recording stopped.");
         }
 
-        /// <summary>
-        /// Sets whether or not to start or stop a recording.
-        /// Used with the Unity UI system.
-        /// </summary>
-        /// <param name="active"></param>
-        public void ToggleRecording()
-        {
-            if (IsRecording)
-                StopRecording();
-            else
-                StartRecording();
-        }
-
         public PN_NotePlaybackManager playbackManager;
-
-        /// <summary>
-        /// Plays the most recent recording.
-        /// Used with the Unity UI system.
-        /// </summary>
-        public void PlayMostRecentRecording()
-        {
-            playbackManager.PlayRecordingSession(PreviousRecordingSessions.ElementAt(PreviousRecordingSessions.Count - 1));
-        }
 
         #endregion
     }

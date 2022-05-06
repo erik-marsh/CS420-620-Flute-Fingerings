@@ -33,19 +33,9 @@ namespace NotePlayer
             public float _NoteStartTime = -1f;
             public float _NoteEndTime = -1f;
 
-            // deprecated, we want to use a MIDI note value instead (Erik)
-            //public NoteInfo _NoteInfo;
-
-            // a bit too C-like for my liking but i'll roll with it for now (Erik)
+            // -1 indicates an invalid note.
+            // this is a general semantic detail used within the project
             public int _MIDINote = -1;
-
-            //public bool IsValid { 
-            //    get => (
-            //    _NoteStartTime >= 0
-            //    && _NoteEndTime >= _NoteStartTime
-            //    && _NoteInfo != null
-            //    );
-            //}
 
             public bool IsValid {
                 get => (
@@ -82,7 +72,6 @@ namespace NotePlayer
         {
             if (!ValidateEntry(entry))
             {
-                //Debug.LogWarning(entry.ToString() + " Entry Invalid!" + "\n start " + entry._NoteStartTime + "\n end " + entry._NoteEndTime + "\n info " + entry._NoteInfo);
                 Debug.LogWarning(entry.ToString() + " Entry Invalid!" + "\n start " + entry._NoteStartTime + "\n end " + entry._NoteEndTime + "\n MIDI note " + entry._MIDINote);
                 return false;
             }
@@ -113,6 +102,10 @@ namespace NotePlayer
             }
         }
 
+        /// <summary>
+        /// Gets the duration of the entire recording.
+        /// </summary>
+        /// <returns></returns>
         public float GetRecordingDuration()
         {
             if (List_RecordingEntries.Count == 0) return 0.0f;

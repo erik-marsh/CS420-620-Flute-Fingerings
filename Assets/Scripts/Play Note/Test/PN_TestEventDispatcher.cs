@@ -144,6 +144,4 @@ namespace NotePlayer
             Options.Test2_PlaybackManager.StopActivePlayback();
         }
     }
-
-
 }

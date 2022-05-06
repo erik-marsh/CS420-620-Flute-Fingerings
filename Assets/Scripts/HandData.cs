@@ -88,15 +88,18 @@ public class HandData : MonoBehaviour
     private void OnEnable()
     {
         PN_NotePlaybackManager.OnNotePlayed += OnNotePlayed;
-        PN_NotePlaybackManager.OnPlaybackStopped += OnPlaybackStopped;
     }
 
     private void OnDisable()
     {
         PN_NotePlaybackManager.OnNotePlayed -= OnNotePlayed;
-        PN_NotePlaybackManager.OnPlaybackStopped -= OnPlaybackStopped;
     }
 
+    /// <summary>
+    /// When a recording plays a note, mark it as beign played on the UI.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="midiNote"></param>
     private void OnNotePlayed(object sender, int midiNote)
     {
         if (!isPlayingRecording)
@@ -114,12 +117,6 @@ public class HandData : MonoBehaviour
         }
 
         SetRecordingNote(midiNote);
-    }
-
-    private void OnPlaybackStopped(object sender, System.EventArgs e)
-    {
-        //SetRecordingNote(-1);
-        //isPlayingRecording = false;
     }
     #endregion
 
@@ -256,6 +253,11 @@ public class HandData : MonoBehaviour
         return finger.GetAngle(finger.mChildNodes[1], finger.mChildNodes[3], finger.mChildNodes[4]);
     }
 
+    /// <summary>
+    /// Sets the UI state (piano roll, hands, fingering diagram) to reflect the currently playing MIDI note.
+    /// This is different from the UI updates in the main Update loop, as this sets the elements to a different color.
+    /// </summary>
+    /// <param name="midiNote"></param>
     public void SetRecordingNote(int midiNote)
     {
         if (midiNote < 0)
@@ -286,11 +288,6 @@ public class HandData : MonoBehaviour
                 UIFingerImages[i].color = imageInactiveColor;
             }
         }
-    }
-
-    public void StartPlayingRecording()
-    {
-
     }
     #endregion
 }

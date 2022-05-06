@@ -7,35 +7,47 @@ using NotePlayer;
 
 public class RecordingManager : MonoBehaviour
 {
+    #region Component References
+    // for data retrieval
     public PN_NoteRecorder_EventHandler eventHandler;
     public PN_NotePlaybackManager playbackManger;
     public HandData handData;
 
+    // for modifying UI state
     public RectTransform scrollViewContent;
-    public Button playButton;
     public Button exportButton;
     public Text totalPlaybackLengthText;
     public Text currentPlaybackTimeText;
 
-    private bool isPlaying = false;
-    private float recordingTimer = 0.0f;
-
+    public Button playButton;
     private Text playButtonText;
     private string playButtonInactiveText = "Play selected recording";
     private string playButtonActiveText = "Playing...";
+    #endregion
 
+    #region Prefab References
+    // prefab used to instantiate buttons that let you select recordings for playback
     public GameObject buttonPrefab;
+    #endregion
+
+    #region Script Parameters
     [Header("Recording Button Default")]
     public ColorBlock recordingButtonDefault;
     [Header("Recording Button Active")]
     public ColorBlock recordingButtonActive;
-    public Color _recordingButtonActive = new Color(0.447f, 0.522f, 1.0f, 1.0f);
+    #endregion
+
+    #region Session Playback
+    // timer to determine when to show blue visualizations (recording playback) or green visualizations (general-purpose)
+    private bool isPlaying = false;
+    private float recordingTimer = 0.0f;
 
     // -1 if there are no sessions to play
     public int sessionToPlay = -1;
 
     private List<GameObject> scrollViewContentItems = new List<GameObject>();
     private int lastRepopulationCount = 0;
+    #endregion
 
     #region Unity Messages
     private void Awake()
@@ -81,6 +93,10 @@ public class RecordingManager : MonoBehaviour
     }
 
     #region Button Callbacks
+    /// <summary>
+    /// Toggles recording. If toggled off, the list of recordings is updated.
+    /// </summary>
+    /// <param name="toggle"></param>
     public void ToggleRecording(Toggle toggle)
     {
         if (toggle.isOn)
@@ -94,6 +110,9 @@ public class RecordingManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// If a valid recording session is selected, begin playback of that session in another thread.
+    /// </summary>
     public void PlaySelectedRecording()
     {
         if (sessionToPlay < 0) return;
@@ -104,7 +123,6 @@ public class RecordingManager : MonoBehaviour
         {
             playbackManger.PlayRecordingSession(session);
             isPlaying = true;
-            handData.StartPlayingRecording();
             recordingTimer = 0.0f;
             playButtonText.text = playButtonActiveText;
             playButton.colors = recordingButtonActive;
@@ -112,6 +130,10 @@ public class RecordingManager : MonoBehaviour
     }
     #endregion
 
+    #region Helpers
+    /// <summary>
+    /// Fills out the list of recordings with recordings that have been recorded since the last recording.
+    /// </summary>
     public void PopulateRecordingList()
     {
         for (int i = lastRepopulationCount; i < eventHandler.PreviousRecordingSessions.Count; i++)
@@ -131,6 +153,9 @@ public class RecordingManager : MonoBehaviour
         lastRepopulationCount = eventHandler.PreviousRecordingSessions.Count;
     }
 
+    /// <summary>
+    /// Clears the recording list.
+    /// </summary>
     public void ClearRecordingList()
     {
         foreach (var obj in scrollViewContentItems)
@@ -145,6 +170,10 @@ public class RecordingManager : MonoBehaviour
         exportButton.interactable = false;
     }
 
+    /// <summary>
+    /// Sets a recoring session as the session that will be played when the play button is pressed.
+    /// </summary>
+    /// <param name="sessionID"></param>
     public void SelectRecording(int sessionID)
     {
         // reset last button's color
@@ -160,6 +189,6 @@ public class RecordingManager : MonoBehaviour
         PN_RecordingSession session = eventHandler.PreviousRecordingSessions.ElementAt(sessionToPlay);
         currentPlaybackTimeText.text = "0.00sec ";
         totalPlaybackLengthText.text = $"/ {session.GetRecordingDuration().ToString("0.00")}sec";
-
     }
+    #endregion
 }

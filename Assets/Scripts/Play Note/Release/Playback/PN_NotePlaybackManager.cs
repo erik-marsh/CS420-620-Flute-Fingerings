@@ -101,16 +101,6 @@ namespace NotePlayer
                 float nextDelay_Seconds;
                 while (!cancelToken.IsCancellationRequested && curNoteIndex < session.List_RecordingEntries.Count)
                 {
-                    ////play current note
-                    //PN_NotePlayer np = _Preset.CreateNotePlayer(session.List_RecordingEntries[curNoteIndex]._NoteInfo._Name);
-                    //np._NoteDuration = Mathf.Abs(session.List_RecordingEntries[curNoteIndex]._NoteStartTime - session.List_RecordingEntries[curNoteIndex]._NoteEndTime);
-
-                    ////append to debug log
-                    //if(FLAG_Debug)
-                    //{
-                    //    debugOutput += "{ " + session.List_RecordingEntries[curNoteIndex]._NoteInfo._Name + ", " + session.List_RecordingEntries[curNoteIndex]._NoteStartTime + " }, ";
-                    //}
-
                     if (_MIDIPlayer == null)
                     {
                         Debug.LogWarning("Cannot play note: no MIDI player is set for " + gameObject.name);
@@ -119,6 +109,7 @@ namespace NotePlayer
                     {
                         float noteDuration = Mathf.Abs(session.List_RecordingEntries[curNoteIndex]._NoteStartTime - session.List_RecordingEntries[curNoteIndex]._NoteEndTime);
 
+                        // use the MIDI player library to create sound
                         _MIDIPlayer.MPTK_PlayEvent(new MPTKEvent {
                             Command = MPTKCommand.NoteOn,
                             Value = session.List_RecordingEntries[curNoteIndex]._MIDINote,
