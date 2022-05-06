@@ -9,14 +9,27 @@ public class RecordingManager : MonoBehaviour
 {
     public PN_NoteRecorder_EventHandler eventHandler;
     public PN_NotePlaybackManager playbackManger;
+    public HandData handData;
+
     public RectTransform scrollViewContent;
     public Button playButton;
+    public Button exportButton;
+    public Text totalPlaybackLengthText;
+    public Text currentPlaybackTimeText;
+
+    private bool isPlaying = false;
+    private float recordingTimer = 0.0f;
 
     private Text playButtonText;
     private string playButtonInactiveText = "Play selected recording";
     private string playButtonActiveText = "Playing...";
 
     public GameObject buttonPrefab;
+    [Header("Recording Button Default")]
+    public ColorBlock recordingButtonDefault;
+    [Header("Recording Button Active")]
+    public ColorBlock recordingButtonActive;
+    public Color _recordingButtonActive = new Color(0.447f, 0.522f, 1.0f, 1.0f);
 
     // -1 if there are no sessions to play
     public int sessionToPlay = -1;
@@ -28,6 +41,25 @@ public class RecordingManager : MonoBehaviour
     private void Awake()
     {
         playButtonText = playButton.GetComponentInChildren<Text>();
+    }
+
+    private void Update()
+    {
+        if (!isPlaying) return;
+
+        recordingTimer += Time.deltaTime;
+
+        if (recordingTimer <= eventHandler.PreviousRecordingSessions.ElementAt(sessionToPlay).GetRecordingDuration())
+        {
+            // extra space is for formatting
+            currentPlaybackTimeText.text = recordingTimer.ToString("0.00") + "sec ";
+        }
+        else
+        {
+            isPlaying = false;
+            handData.isPlayingRecording = false;
+            handData.SetRecordingNote(-1); // and disable any remaining recording visualizations
+        }
     }
 
     private void OnEnable()
@@ -44,6 +76,8 @@ public class RecordingManager : MonoBehaviour
     private void OnPlaybackStopped(object sender, System.EventArgs e)
     {
         playButtonText.text = playButtonInactiveText;
+        playButton.colors = recordingButtonDefault;
+        //isPlaying = false;
     }
 
     #region Button Callbacks
@@ -69,7 +103,11 @@ public class RecordingManager : MonoBehaviour
         if (session.List_RecordingEntries.Count > 0)
         {
             playbackManger.PlayRecordingSession(session);
+            isPlaying = true;
+            handData.StartPlayingRecording();
+            recordingTimer = 0.0f;
             playButtonText.text = playButtonActiveText;
+            playButton.colors = recordingButtonActive;
         }
     }
     #endregion
@@ -87,8 +125,7 @@ public class RecordingManager : MonoBehaviour
             associatedSession.sessionID = i;
 
             var text = buttonObj.GetComponentInChildren<Text>();
-            // sorry about this
-            text.text = "Recording " + session.recordingID + " (" + session.List_RecordingEntries.Count + " notes, " + (session.List_RecordingEntries.Count == 0 ? "0sec)" : session.List_RecordingEntries[session.List_RecordingEntries.Count - 1]._NoteEndTime + "sec)");
+            text.text = $"Recording {session.recordingID} ({session.List_RecordingEntries.Count} notes, {session.GetRecordingDuration().ToString("0.00")} sec)";
         }
 
         lastRepopulationCount = eventHandler.PreviousRecordingSessions.Count;
@@ -105,5 +142,24 @@ public class RecordingManager : MonoBehaviour
         lastRepopulationCount = 0;
         sessionToPlay = -1;
         playButton.interactable = false;
+        exportButton.interactable = false;
+    }
+
+    public void SelectRecording(int sessionID)
+    {
+        // reset last button's color
+        if (sessionToPlay >= 0)
+            scrollViewContentItems[sessionToPlay].GetComponent<Button>().colors = recordingButtonDefault;
+
+        sessionToPlay = sessionID;
+        scrollViewContentItems[sessionToPlay].GetComponent<Button>().colors = recordingButtonActive;
+
+        playButton.interactable = true;
+        exportButton.interactable = true;
+
+        PN_RecordingSession session = eventHandler.PreviousRecordingSessions.ElementAt(sessionToPlay);
+        currentPlaybackTimeText.text = "0.00sec ";
+        totalPlaybackLengthText.text = $"/ {session.GetRecordingDuration().ToString("0.00")}sec";
+
     }
 }

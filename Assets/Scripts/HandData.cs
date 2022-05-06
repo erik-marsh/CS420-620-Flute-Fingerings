@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Hi5_Interaction_Core;
+using NotePlayer;
 
 /// <summary>
 /// Class that manages and interprets input from the gloves.
@@ -15,6 +16,7 @@ public class HandData : MonoBehaviour
     // LIndex, LMiddle, LRing, LPinky, LThumb, RIndex, RMiddle, RRing, RPinky, RThumb
     public PianoRoll pianoRoll;
     public Text fingeringName;
+    public Text detected;
     public Text[] texts;
     public Image[] UIFingerImages;
     public Image[] FingeringDiagramImages;
@@ -25,6 +27,7 @@ public class HandData : MonoBehaviour
     public float updatePeriod = 0.5f;
 
     public Color activatedColor = Color.green;
+    public Color activatedColorRecording = Color.blue;
     public Color textInactiveColor = Color.black;
     public Color imageInactiveColor = Color.white;
     #endregion
@@ -35,6 +38,8 @@ public class HandData : MonoBehaviour
     private Fingering lastFingering = Fingering.nullFingering;
 
     public Hi5_Glove_Interaction_Finger[] fingers;
+
+    public bool isPlayingRecording = false;
     #endregion
 
     #region Static Data
@@ -79,6 +84,45 @@ public class HandData : MonoBehaviour
     }
     #endregion
 
+    #region Event Handlers
+    private void OnEnable()
+    {
+        PN_NotePlaybackManager.OnNotePlayed += OnNotePlayed;
+        PN_NotePlaybackManager.OnPlaybackStopped += OnPlaybackStopped;
+    }
+
+    private void OnDisable()
+    {
+        PN_NotePlaybackManager.OnNotePlayed -= OnNotePlayed;
+        PN_NotePlaybackManager.OnPlaybackStopped -= OnPlaybackStopped;
+    }
+
+    private void OnNotePlayed(object sender, int midiNote)
+    {
+        if (!isPlayingRecording)
+        {
+            // clear visualizations
+            pianoRoll.SetKey(-1, activatedColorRecording);
+            for (int i = 0; i < 9; i++)
+            {
+                FingeringDiagramImages[i].color = imageInactiveColor;
+                UIFingerImages[i].color = imageInactiveColor;
+                texts[i].color = textInactiveColor;
+            }
+
+            isPlayingRecording = true;
+        }
+
+        SetRecordingNote(midiNote);
+    }
+
+    private void OnPlaybackStopped(object sender, System.EventArgs e)
+    {
+        //SetRecordingNote(-1);
+        //isPlayingRecording = false;
+    }
+    #endregion
+
     #region Main Logic
     /// <summary>
     /// The main logic loop. Executes every updatePeriod.
@@ -86,6 +130,9 @@ public class HandData : MonoBehaviour
     /// </summary>
     private void Update()
     {
+        // when playing a recording, we disable the green hand/fingering/piano visualizations in favor of blue recording visualizations
+        if (isPlayingRecording) return;
+
         timer += Time.deltaTime;
         if (timer <= updatePeriod) return;
 
@@ -132,8 +179,9 @@ public class HandData : MonoBehaviour
         }
 
         var fingering = Fingering.GetFingeringByCombination(keyCombination);
+        detected.text = "Detected: ";
         fingeringName.text = "No note detected.";
-        pianoRoll.SetKey(fingering.midiNote);
+        pianoRoll.SetKey(fingering.midiNote, activatedColor);
 
         if (fingering != Fingering.nullFingering)
         {
@@ -206,6 +254,43 @@ public class HandData : MonoBehaviour
         var finger = fingers[fingerIndex];
         // these are indexed starting at 1 for some reason
         return finger.GetAngle(finger.mChildNodes[1], finger.mChildNodes[3], finger.mChildNodes[4]);
+    }
+
+    public void SetRecordingNote(int midiNote)
+    {
+        if (midiNote < 0)
+        {
+            pianoRoll.SetKey(midiNote, activatedColorRecording);
+            for (int i = 0; i < 9; i++)
+            {
+                FingeringDiagramImages[i].color = imageInactiveColor;
+                UIFingerImages[i].color = imageInactiveColor;
+            }
+        }
+
+        pianoRoll.SetKey(midiNote, activatedColorRecording);
+        Fingering currentFingering = Fingering.GetFingeringByMIDINote(midiNote);
+        detected.text = "Playing: ";
+        fingeringName.text = currentFingering.name + " (" + currentFingering.frequency.ToString("0.00") + "Hz)";
+
+        for (int i = 0; i < 9; i++)
+        {
+            if ((currentFingering.keyCombination & (1 << i)) > 0L)
+            {
+                FingeringDiagramImages[i].color = activatedColorRecording;
+                UIFingerImages[i].color = activatedColorRecording;
+            }
+            else
+            {
+                FingeringDiagramImages[i].color = imageInactiveColor;
+                UIFingerImages[i].color = imageInactiveColor;
+            }
+        }
+    }
+
+    public void StartPlayingRecording()
+    {
+
     }
     #endregion
 }

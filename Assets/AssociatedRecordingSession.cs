@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AssociatedRecordingSession : MonoBehaviour
 {
@@ -10,7 +11,6 @@ public class AssociatedRecordingSession : MonoBehaviour
 
     public void SelectRecording()
     {
-        recordingManager.sessionToPlay = sessionID;
-        recordingManager.playButton.interactable = true;
+        recordingManager.SelectRecording(sessionID);
     }
 }

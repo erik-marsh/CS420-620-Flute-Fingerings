@@ -43,6 +43,7 @@ namespace NotePlayer
 
         #region Events
         public static event System.EventHandler OnPlaybackStopped;
+        public static event System.EventHandler<int> OnNotePlayed;
         #endregion
 
         #region Initialization
@@ -126,6 +127,7 @@ namespace NotePlayer
                             Velocity = 100,
                             Delay = 0
                         });
+                        OnNotePlayed?.Invoke(this, session.List_RecordingEntries[curNoteIndex]._MIDINote);
                     }
 
                     //compute delay offset to next note

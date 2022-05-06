@@ -191,6 +191,7 @@ namespace NotePlayer
 
             _List_InactiveRecordingSessions.Add(ActiveRecordingSession);
             ActiveRecordingSession = null;
+            //CurrentActiveNote = null;
         }
 
         #endregion

@@ -112,5 +112,12 @@ namespace NotePlayer
                 }
             }
         }
+
+        public float GetRecordingDuration()
+        {
+            if (List_RecordingEntries.Count == 0) return 0.0f;
+
+            return List_RecordingEntries[List_RecordingEntries.Count - 1]._NoteEndTime - List_RecordingEntries[0]._NoteStartTime;
+        }
     }
 }

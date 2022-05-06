@@ -93,7 +93,7 @@ public class PianoRoll : MonoBehaviour
     /// Giving this function -1 as a parameter will reset it (by convention).
     /// </summary>
     /// <param name="midiNote">The MIDI note to highlight.</param>
-    public void SetKey(int midiNote)
+    public void SetKey(int midiNote, Color activeColor)
     {
         // this is a little jank, but we clear the keyboard colors before checking if the note is valid
         // in order to implicitly have invalid notes reset the keyboard colors
@@ -105,7 +105,7 @@ public class PianoRoll : MonoBehaviour
 
         int keyIndex = midiNote - startNote;
         var keyImage = keyObjects[keyIndex].GetComponent<Image>();
-        keyImage.color = Color.green;
+        keyImage.color = activeColor;
         lastSetKeyIndex = keyIndex;
     }
     #endregion
