@@ -14,9 +14,9 @@ This being a prototype demo some parts could be static (not actually executable)
 
 Part of the demo show a bit of the code you created/used, but do not go into small details -- rather, **provide a "big picture" of the code** and some elements that help assess its scope.  
 
-The recommended tool to use is Zoom (to video and audio record your project demo) but in principle you could use other video creation tool that produces the same result: a demo consisting of a video and audio narrative explaining the project you worked on in CS 420/620, with particular emphasis on its user interface. The expected length of your video demo: **10 to 14 minutes**
+a demo consisting of a **video and audio narrative explaining the project you worked on in CS 420/620, with particular emphasis on its user interface.** The expected length of your video demo: **10 to 14 minutes**
 
-Please provide a link via regular Canvas submission where you share your project demo with the instructor, Sergiu Dascalu (dascalus@unr.edu) & the TA, Nicole Beaulieu (nbeaulieu@nevada.unr.edu). Please allow them to download and see your CS 420/620 project demo.  Name your video TXX_demo, where XX is your team number. 
+Please provide a link via regular Canvas submission where you share your project demo with the instructor, Sergiu Dascalu (dascalus@unr.edu) & the TA, Nicole Beaulieu (nbeaulieu@nevada.unr.edu). Please allow them to download and see your CS 420/620 project demo.  **Name your video TXX_demo, where XX is your team number.**
 
 ## 2. Source code
 * A summary of your code content (recommended: 1 to 3 pages)

@@ -49,16 +49,16 @@ public class HandData : MonoBehaviour
     /// </summary>
     private static float[] fingerThresholds = new float[10]
     {
-        30.0f, // LIndex
-        80.0f, // LMiddle
-        90.0f, // LRing
+        25.0f, // LIndex
+        40.0f, // LMiddle
+        70.0f, // LRing
         80.0f, // LPinky
-        157.0f, // LThumb
+        160.0f, // LThumb
 
-        45.0f, // RIndex
-        70.0f, // RMiddle
-        80.0f, // RRing
-        120.0f, // RPinky
+        20.0f, // RIndex
+        50.0f, // RMiddle
+        35.0f, // RRing
+        65.0f, // RPinky
         0.0f    // RThumb
     };
     #endregion
