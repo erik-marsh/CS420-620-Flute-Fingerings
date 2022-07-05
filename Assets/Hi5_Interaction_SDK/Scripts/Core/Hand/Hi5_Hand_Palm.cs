@@ -22,7 +22,8 @@ namespace Hi5_Interaction_Core
 		bool isSetLayer = false;
         internal bool IsOpenCollider = true;
 		void Update()
-		{
+        {
+            return;
 
             Dictionary<int, Hi5_Glove_Interaction_Item> dic=  Hi5_Interaction_Object_Manager.GetObjectManager().GetItems();
             bool temp = false;

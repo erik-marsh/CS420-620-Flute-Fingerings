@@ -17,7 +17,8 @@ namespace Hi5_Interaction_Core
 
 
 		 internal bool IsPinch()
-		{
+		 {
+			 return false;
             if (mHand.gameObject.GetComponent<Hi5_Glove_Property>() != null)
             {
                 if (!mHand.gameObject.GetComponent<Hi5_Glove_Property>().Property_Data.IsPinch)
@@ -94,6 +95,7 @@ namespace Hi5_Interaction_Core
 
 		internal bool IsFlyPinch()
 		{
+			return false;
             if (mHand.gameObject.GetComponent<Hi5_Glove_Property>() != null)
             {
                 if (!mHand.gameObject.GetComponent<Hi5_Glove_Property>().Property_Data.IsPinch)
@@ -150,6 +152,7 @@ namespace Hi5_Interaction_Core
 
 		internal bool IsPinch2()
 		{
+			return false;
             if (mHand.gameObject.GetComponent<Hi5_Glove_Property>() != null)
             {
                 if (!mHand.gameObject.GetComponent<Hi5_Glove_Property>().Property_Data.IsPinch)
@@ -216,6 +219,7 @@ namespace Hi5_Interaction_Core
 
 		internal bool IsClap()
 		{
+			return false;
             if (mHand.gameObject.GetComponent<Hi5_Glove_Property>() != null)
             {
                 if (!mHand.gameObject.GetComponent<Hi5_Glove_Property>().Property_Data.IsClap)
@@ -271,6 +275,7 @@ namespace Hi5_Interaction_Core
 
 		internal bool IsLift()
 		{
+			return false;
             if (mHand.gameObject.GetComponent<Hi5_Glove_Property>() != null)
             {
                 if (!mHand.gameObject.GetComponent<Hi5_Glove_Property>().Property_Data.IsLift)

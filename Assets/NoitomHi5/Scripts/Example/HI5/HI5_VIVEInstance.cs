@@ -7,7 +7,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using Valve.VR;
+//using Valve.VR;
 using HI5.VRCalibration;
 
     namespace HI5
@@ -196,34 +196,34 @@ using HI5.VRCalibration;
             }
         }
 
-        private void OnNewPoses(TrackedDevicePose_t[] poses)
-        {
-
-            int index = HandType == Hand.LEFT ? HI5_BindInfoManager.LeftID : HI5_BindInfoManager.RightID;
-
-            if (index == -1)
-                return;
-
-            if (poses.Length <= index)
-                return;
-
-            if (!poses[index].bDeviceIsConnected)
-                return;
-
-            if (!poses[index].bPoseIsValid)
-                return;
-
-            //var pose = new SteamVR_Utils.RigidTransform(poses[index].mDeviceToAbsoluteTracking);
-
-            Vector3 pos = Vector3.zero;// pose.pos;
-            Quaternion rot = Quaternion.identity;// pose.rot;
-            if (m_Status.Status != GloveStatus.NoGlove 
-                && m_Status.Status != GloveStatus.NoDongle
-                && HI5_Manager.IsDongleAvailable()
-                && HI5_Manager.IsHasDongle)
-                ApplyHandMotion_Position(pos, rot);
-           
-        }
+        // private void OnNewPoses(TrackedDevicePose_t[] poses)
+        // {
+        //
+        //     int index = HandType == Hand.LEFT ? HI5_BindInfoManager.LeftID : HI5_BindInfoManager.RightID;
+        //
+        //     if (index == -1)
+        //         return;
+        //
+        //     if (poses.Length <= index)
+        //         return;
+        //
+        //     if (!poses[index].bDeviceIsConnected)
+        //         return;
+        //
+        //     if (!poses[index].bPoseIsValid)
+        //         return;
+        //
+        //     //var pose = new SteamVR_Utils.RigidTransform(poses[index].mDeviceToAbsoluteTracking);
+        //
+        //     Vector3 pos = Vector3.zero;// pose.pos;
+        //     Quaternion rot = Quaternion.identity;// pose.rot;
+        //     if (m_Status.Status != GloveStatus.NoGlove 
+        //         && m_Status.Status != GloveStatus.NoDongle
+        //         && HI5_Manager.IsDongleAvailable()
+        //         && HI5_Manager.IsHasDongle)
+        //         ApplyHandMotion_Position(pos, rot);
+        //    
+        // }
         
         /*
         private void LoadValidBones()
